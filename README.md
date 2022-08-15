@@ -1,6 +1,6 @@
 # django-material-demo
 
-# Goal
+## Goal
 
 Demonstrate django admin site common use case.
 
@@ -39,3 +39,10 @@ Demonstrate django admin site common use case.
         - Sort by field joining other tables
     - Show data by joining other tables
     - Custom actions on data selection
+
+## Setup
+
+1. Run `make setup` to setup a docker container (for first time only)
+2. Run `make start` to start the web server in the docker container
+3. Go to http://127.0.0.1:3000/admin to see the demo website (use `demo` as both the username and password)
+4. Run `make clean` to remove the docker container
