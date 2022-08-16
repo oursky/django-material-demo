@@ -26,16 +26,16 @@ clean:
 
 .PHONY: migrations
 migrations:
-	docker-compose run --rm web python manage.py makemigrations
+	docker compose run --rm web python manage.py makemigrations
 
 .PHONY: migrate
 migrate:
-	docker-compose run --rm web python manage.py migrate
+	docker compose run --rm web python manage.py migrate
 
 .PHONY: load-data
 load-data:
-	docker-compose run --rm web python manage.py loaddata polls/sample_data.json
+	docker compose run --rm web python manage.py loaddata polls/sample_data.json
 
 .PHONY: create-superuser
 create-superuser:
-	docker-compose run --rm web python manage.py createsuperuser
+	docker compose run --rm web python manage.py createsuperuser
