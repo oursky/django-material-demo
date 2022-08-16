@@ -49,3 +49,6 @@ Demonstrate django admin site common use case.
 - Run `make start` to start the web server. Then go to http://127.0.0.1:3000/admin to see the demo website
 - Run `make migrations` then `make migrate` for model migrations
 - Run `make clean` to remove the docker containers
+
+## Acknowledgement
+- The initial project files are adapted from the "Writing your first Django app" tutorial at https://docs.djangoproject.com/en/4.1/intro/
