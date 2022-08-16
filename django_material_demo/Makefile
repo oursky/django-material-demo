@@ -12,7 +12,6 @@ secret:
 .PHONY: setup
 setup: secret
 	docker compose up --build --no-start
-	make migrations
 	make migrate
 	make load-data
 	
