@@ -1,16 +1,27 @@
 .PHONY: setup
 setup:
-	docker build --tag django_material_demo .
-	docker create -p 3000:8000 -it --name django_material_demo_container django_material_demo
+	docker compose up --build --no-start
 	
 .PHONY: start
 start:
-	docker start -ai django_material_demo_container
+	docker compose up
 
 .PHONY: clean
 clean:
-	docker rm django_material_demo_container
+	docker compose down
 
-.PHONY: runserver
-runserver:
-	python manage.py runserver 0:8000
+.PHONY: migrations
+migrations:
+	docker-compose run --rm web python manage.py makemigrations
+
+.PHONY: migrate
+migrate:
+	docker-compose run --rm web python manage.py migrate
+
+.PHONY: load-data
+load-data:
+	docker-compose run --rm web python manage.py loaddata polls/sample_data.json
+
+.PHONY: create-superuser
+create-superuser:
+	docker-compose run --rm web python manage.py createsuperuser
