@@ -40,9 +40,12 @@ Demonstrate django admin site common use case.
     - Show data by joining other tables
     - Custom actions on data selection
 
-## Setup
+## Initial Setup
 
-1. Run `make setup` to setup a docker container (for first time only)
-2. Run `make start` to start the web server in the docker container
-3. Go to http://127.0.0.1:3000/admin to see the demo website (use `demo` as both the username and password)
-4. Run `make clean` to remove the docker container
+1. Run `make setup` to setup docker containers
+2. Run `make create-superuser` to create an account to access the admin site
+
+## Dev Workflow
+- Run `make start` to start the web server. Then go to http://127.0.0.1:3000/admin to see the demo website
+- Run `make migrations` then `make migrate` for model migrations
+- Run `make clean` to remove the docker containers
