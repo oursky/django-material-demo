@@ -2,12 +2,10 @@
 
 FROM python:3
 
-WORKDIR /django_material_demo
-
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY /django_material_demo .
+COPY . .
 
 RUN python manage.py migrate
 RUN DJANGO_SUPERUSER_PASSWORD=demo python manage.py createsuperuser --noinput --username demo --email demo@mail.com
