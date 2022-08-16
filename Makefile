@@ -1,12 +1,12 @@
 .PHONY: setup
 setup:
-	docker build --tag mysite-main .
-	docker create -p 3000:8000 -it --name mysite-container mysite-main
+	docker build --tag django_material_demo .
+	docker create -p 3000:8000 -it --name django_material_demo_container django_material_demo
 	
 .PHONY: start
 start:
-	docker start -ai mysite-container
+	docker start -ai django_material_demo_container
 
 .PHONY: clean
 clean:
-	docker rm mysite-container
+	docker rm django_material_demo_container
