@@ -4,8 +4,8 @@
 <head>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
-{% include 'material/includes/material_css.html' %}
-{% include 'material/includes/material_js.html' %}
+{% comment %} {% include 'material/includes/material_css.html' %}
+{% include 'material/includes/material_js.html' %} {% endcomment %}
 {% block dark-mode-vars %}
   <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
 {% endblock %}

@@ -13,7 +13,7 @@
         "fields": {
             "question": 1,
             "choice_text": "Not much",
-            "votes": 3
+            "vote_count": 3
         }
     },
     {
@@ -22,7 +22,7 @@
         "fields": {
             "question": 1,
             "choice_text": "The sky",
-            "votes": 3
+            "vote_count": 3
         }
     }
 ]
