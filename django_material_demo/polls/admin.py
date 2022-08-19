@@ -33,11 +33,11 @@ class QuestionAdmin(admin.ModelAdmin):
         (None, {
             'fields': ['question_text', 'total_vote_count']
         }),
+        ('User related', {
+            'fields': [('creator', 'show_creator'), 'followers']
+        }),
         ('Date information', {
-            'fields': [
-                'pub_date',
-                ('vote_start', 'vote_end'),
-            ],
+            'fields': ['pub_date', ('vote_start', 'vote_end'), ],
             'classes': ['collapse'],
         }),
         ('Vote restrictions', {
