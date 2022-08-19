@@ -31,7 +31,7 @@ class AttachmentInline(admin.TabularInline):
 class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {
-            'fields': ['question_text', 'total_vote_count']
+            'fields': ['question_text', 'total_vote_count', 'thumbnail']
         }),
         ('User related', {
             'fields': [('creator', 'show_creator'), 'followers']

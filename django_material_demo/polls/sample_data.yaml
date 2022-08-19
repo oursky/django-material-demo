@@ -142,7 +142,7 @@
   fields:
     question_text: What's up?
     total_vote_count: 6
-    thumbmail: null
+    thumbnail: null
     creator: 1
     show_creator: false
     pub_date: 2022-08-12 03:35:51+00:00
@@ -165,7 +165,7 @@
   fields:
     question_text: What is your favourite colour?
     total_vote_count: 0
-    thumbmail: null
+    thumbnail: null
     creator: null
     show_creator: false
     pub_date: 2022-08-19 04:29:47+00:00

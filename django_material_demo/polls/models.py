@@ -41,7 +41,7 @@ class Question(models.Model):
     question_text = models.CharField(max_length=200)
     total_vote_count = models.IntegerField(default=0)
 
-    thumbmail = models.ForeignKey(
+    thumbnail = models.ForeignKey(
         File, on_delete=models.CASCADE, null=True, blank=True)
 
     creator = models.ForeignKey(

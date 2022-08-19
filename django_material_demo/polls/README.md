@@ -21,7 +21,7 @@
 
 - question_text, string (200 max)
 - total_vote_count, int
-- thumbmail, (file FK)
+- thumbnail, (file FK)
 - creator, (user FK)
 - show_creator, boolean (name appears in poll?)
 - followers, ManyToManyFieid to User
