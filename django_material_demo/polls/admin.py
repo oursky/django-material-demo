@@ -1,6 +1,20 @@
 from django.contrib import admin
 
-from .models import Choice, Question, User
+from .models import Attachment, Choice, File, Question, User, Vote
+
+
+@admin.register(File)
+class FileAdmin(admin.ModelAdmin):
+    list_display = ['file_name', 'file_type', 'file_size', 'storage_loc']
+    list_filter = ['file_type', 'storage_loc']
+    search_fields = ['file_name']
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ['name', 'group', 'subs_start', 'subs_expire']
+    list_filter = ['group']
+    search_fields = ['name']
 
 
 class ChoiceInline(admin.TabularInline):
@@ -8,6 +22,12 @@ class ChoiceInline(admin.TabularInline):
     extra = 3
 
 
+class AttachmentInline(admin.TabularInline):
+    model = Attachment
+    extra = 1
+
+
+@admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {
@@ -29,7 +49,7 @@ class QuestionAdmin(admin.ModelAdmin):
             ],
             'classes': ['collapse'],
         })]
-    inlines = [ChoiceInline]
+    inlines = [ChoiceInline, AttachmentInline]
 
     list_display = ['question_text', 'pub_date', 'vote_start',
                     'vote_end', 'total_vote_count', 'selection_bounds']
@@ -37,5 +57,15 @@ class QuestionAdmin(admin.ModelAdmin):
     search_fields = ['question_text']
 
 
-admin.site.register(User)
-admin.site.register(Question)
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    fields = [
+        'question',
+        'timestamp',
+        'is_custom',
+        'choice',
+        'custom_choice_text',
+    ]
+    list_display = ['question', 'choice_text', 'is_custom', 'timestamp']
+    list_filter = ['is_custom']
+    search_fields = ['question']

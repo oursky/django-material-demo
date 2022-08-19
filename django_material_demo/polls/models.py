@@ -10,6 +10,9 @@ class File(models.Model):
     file_type = models.TextField()
     file_size = models.IntegerField()
 
+    def __str__(self):
+        return self.file_name
+
 
 class User(models.Model):
     name = models.CharField(max_length=50)
@@ -28,7 +31,10 @@ class User(models.Model):
     subs_expire = models.DateField(
         'subscription expire date', null=True, blank=True)
 
-    followers = models.ManyToManyField('User')
+    followers = models.ManyToManyField('User', blank=True, symmetrical=False)
+
+    def __str__(self):
+        return self.name
 
 
 class Question(models.Model):
@@ -42,7 +48,7 @@ class Question(models.Model):
         User, on_delete=models.CASCADE, related_name='creates', null=True, blank=True)
     show_creator = models.BooleanField(default=False)
 
-    followers = models.ManyToManyField(User, related_name='follows')
+    followers = models.ManyToManyField(User, related_name='follows', blank=True)
 
     pub_date = models.DateTimeField('date published', default=timezone.now)
     vote_start = models.DateTimeField(
@@ -94,7 +100,20 @@ class Vote(models.Model):
     custom_choice_text = models.CharField(
         max_length=200, null=True, blank=True)
 
+    def __str__(self) -> str:
+        return '#%(id)s (%(question)s)' % {'question': str(self.question),
+                                           'id': str(self.pk)[:8]}
+
+    def choice_text(self):
+        if self.is_custom:
+            return self.custom_choice_text
+        else:
+            return str(self.choice)
+
 
 class Attachment(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     file = models.OneToOneField(File, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.file)
