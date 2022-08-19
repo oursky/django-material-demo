@@ -33,7 +33,7 @@ migrate:
 
 .PHONY: load-data
 load-data:
-	docker compose run --rm web python manage.py loaddata polls/sample_data.json
+	docker compose run --rm web python manage.py loaddata polls/sample_data.yaml
 
 .PHONY: create-superuser
 create-superuser:
