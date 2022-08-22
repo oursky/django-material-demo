@@ -5,6 +5,14 @@ from .models import Attachment, Choice, File, Question, User, Vote
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
+    readonly_fields = [
+        'file_id',
+        'storage_loc',
+        'file_name',
+        'file_type',
+        'file_size',
+    ]
+
     list_display = ['file_name', 'file_type', 'file_size', 'storage_loc']
     list_filter = ['file_type', 'storage_loc']
     search_fields = ['file_name']
@@ -30,6 +38,7 @@ class UserAdmin(admin.ModelAdmin):
         ('subs_start', 'subs_expire'),
     ]
     inlines = [FollowedQuestion, FollowedUser]
+    radio_fields = {"group": admin.HORIZONTAL}
 
     list_display = ['name', 'group', 'subs_start', 'subs_expire']
     list_filter = ['group']
@@ -99,6 +108,7 @@ class VoteAdmin(admin.ModelAdmin):
         'choice',
         'custom_choice_text',
     ]
-    list_display = ['question', 'choice_text', 'is_custom', 'timestamp']
+
+    list_display = ['timestamp', 'question', 'choice_text', 'is_custom']
     list_filter = ['is_custom']
     search_fields = ['question']

@@ -57,7 +57,7 @@
 - timestamp, datatime
 - is_custom, boolean (is a custom choice?)
 - choice (FK, optional)
-- custom choice text, string (200 max, optional)
+- custom_choice_text, string (200 max, optional)
 
 ## Attachment
 
@@ -129,6 +129,6 @@
 - vote list
     - timestamp (datetime, sort)
     - choice text (sort)
-- filter 
+- filter
     - choice (checkbox)
     - time range (datetime range)

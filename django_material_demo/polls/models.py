@@ -5,7 +5,7 @@ from django.utils import timezone
 
 class File(models.Model):
     file_id = models.TextField()
-    storage_loc = models.TextField()
+    storage_loc = models.TextField('storage location')
     file_name = models.CharField(max_length=100)
     file_type = models.TextField()
     file_size = models.IntegerField()
