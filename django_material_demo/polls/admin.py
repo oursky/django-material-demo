@@ -22,6 +22,7 @@ class FollowedQuestion(admin.TabularInline):
     model = Question.followers.through
     extra = 1
     verbose_name = 'followed question'
+    exclude = ['ordering']
 
 
 class FollowedUser(admin.TabularInline):
@@ -55,16 +56,11 @@ class AttachmentInline(admin.TabularInline):
     extra = 1
 
 
-class FollowerInline(admin.StackedInline):
+class FollowerInline(admin.TabularInline):
     model = Question.followers.through
     extra = 1
     verbose_name = 'follower'
-    fields = [
-        'question',
-        'follower',
-        'ordering',
-        ('enable_email_notify', 'notify_time'),
-    ]
+    fields = ['follower', 'ordering']
 
 
 @admin.register(Question)
