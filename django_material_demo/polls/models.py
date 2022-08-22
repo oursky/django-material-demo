@@ -31,10 +31,24 @@ class User(models.Model):
     subs_expire = models.DateField(
         'subscription expire date', null=True, blank=True)
 
-    followers = models.ManyToManyField('User', blank=True, symmetrical=False)
+    followers = models.ManyToManyField(
+        'User', blank=True, symmetrical=False, through='UserFollower')
 
     def __str__(self):
         return self.name
+
+
+class UserFollower(models.Model):
+    followed_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='followed')
+    follower = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='following')
+    ordering = models.FloatField(default=0)
+    enable_email_notify = models.BooleanField(default=False)
+    notify_time = models.TimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.follower) + ' → ' + str(self.followed_user)
 
 
 class Question(models.Model):
@@ -45,10 +59,12 @@ class Question(models.Model):
         File, on_delete=models.CASCADE, null=True, blank=True)
 
     creator = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='creates', null=True, blank=True)
+        User, on_delete=models.CASCADE, related_name='creates',
+        null=True, blank=True)
     show_creator = models.BooleanField(default=False)
 
-    followers = models.ManyToManyField(User, related_name='follows', blank=True)
+    followers = models.ManyToManyField(
+        User, related_name='follows', blank=True, through='QuestionFollower')
 
     pub_date = models.DateTimeField('date published', default=timezone.now)
     vote_start = models.DateTimeField(
@@ -68,7 +84,7 @@ class Question(models.Model):
     has_max_vote_count = models.BooleanField(default=False)
     max_vote_count = models.IntegerField(null=True, blank=True)
     allow_custom = models.BooleanField('allow custom votes', default=False)
-    
+
     def __str__(self) -> str:
         return self.question_text
 
@@ -117,3 +133,14 @@ class Attachment(models.Model):
 
     def __str__(self):
         return str(self.file)
+
+
+class QuestionFollower(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, on_delete=models.CASCADE)
+    ordering = models.FloatField(default=0)
+    enable_email_notify = models.BooleanField(default=False)
+    notify_time = models.TimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.follower) + ' → ' + str(self.question)

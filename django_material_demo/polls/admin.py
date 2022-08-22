@@ -10,8 +10,27 @@ class FileAdmin(admin.ModelAdmin):
     search_fields = ['file_name']
 
 
+class FollowedQuestion(admin.TabularInline):
+    model = Question.followers.through
+    extra = 1
+    verbose_name = 'followed question'
+
+
+class FollowedUser(admin.TabularInline):
+    model = User.followers.through
+    fk_name = 'follower'
+    extra = 1
+    verbose_name = 'followed user'
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
+    fields = [
+        'name', 'email', 'group',
+        ('subs_start', 'subs_expire'),
+    ]
+    inlines = [FollowedQuestion, FollowedUser]
+
     list_display = ['name', 'group', 'subs_start', 'subs_expire']
     list_filter = ['group']
     search_fields = ['name']
@@ -27,17 +46,31 @@ class AttachmentInline(admin.TabularInline):
     extra = 1
 
 
+class FollowerInline(admin.StackedInline):
+    model = Question.followers.through
+    extra = 1
+    verbose_name = 'follower'
+    fields = [
+        'question',
+        'follower',
+        'ordering',
+        ('enable_email_notify', 'notify_time'),
+    ]
+
+
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {
-            'fields': ['question_text', 'total_vote_count', 'thumbnail']
-        }),
-        ('User related', {
-            'fields': [('creator', 'show_creator'), 'followers']
+            'fields': [
+                'question_text',
+                'total_vote_count',
+                'thumbnail',
+                ('creator', 'show_creator'),
+            ]
         }),
         ('Date information', {
-            'fields': ['pub_date', ('vote_start', 'vote_end'), ],
+            'fields': ['pub_date', ('vote_start', 'vote_end')],
             'classes': ['collapse'],
         }),
         ('Vote restrictions', {
@@ -49,7 +82,7 @@ class QuestionAdmin(admin.ModelAdmin):
             ],
             'classes': ['collapse'],
         })]
-    inlines = [ChoiceInline, AttachmentInline]
+    inlines = [ChoiceInline, AttachmentInline, FollowerInline]
 
     list_display = ['question_text', 'pub_date', 'vote_start',
                     'vote_end', 'total_vote_count', 'selection_bounds']

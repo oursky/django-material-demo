@@ -22,7 +22,6 @@
     group: SA
     subs_start: null
     subs_expire: null
-    followers: []
 - model: polls.user
   pk: 2
   fields:
@@ -31,11 +30,6 @@
     group: SA
     subs_start: null
     subs_expire: null
-    followers:
-    - 8
-    - 9
-    - 10
-    - 7
 - model: polls.user
   pk: 3
   fields:
@@ -44,11 +38,6 @@
     group: DEFAULT
     subs_start: null
     subs_expire: null
-    followers:
-    - 9
-    - 10
-    - 4
-    - 5
 - model: polls.user
   pk: 4
   fields:
@@ -57,11 +46,6 @@
     group: DEFAULT
     subs_start: null
     subs_expire: null
-    followers:
-    - 10
-    - 3
-    - 6
-    - 7
 - model: polls.user
   pk: 5
   fields:
@@ -70,10 +54,6 @@
     group: DEFAULT
     subs_start: null
     subs_expire: null
-    followers:
-    - 8
-    - 2
-    - 10
 - model: polls.user
   pk: 6
   fields:
@@ -82,10 +62,6 @@
     group: SUBS
     subs_start: 2022-08-16
     subs_expire: 2022-10-19
-    followers:
-    - 8
-    - 2
-    - 4
 - model: polls.user
   pk: 7
   fields:
@@ -94,10 +70,6 @@
     group: DEFAULT
     subs_start: null
     subs_expire: null
-    followers:
-    - 9
-    - 3
-    - 5
 - model: polls.user
   pk: 8
   fields:
@@ -106,11 +78,6 @@
     group: SUBS
     subs_start: 2022-07-13
     subs_expire: 2022-11-29
-    followers:
-    - 1
-    - 3
-    - 6
-    - 9
 - model: polls.user
   pk: 9
   fields:
@@ -119,11 +86,6 @@
     group: SUBS
     subs_start: 2022-05-10
     subs_expire: 2022-09-19
-    followers:
-    - 8
-    - 1
-    - 4
-    - 5
 - model: polls.user
   pk: 10
   fields:
@@ -132,11 +94,270 @@
     group: DEFAULT
     subs_start: null
     subs_expire: null
-    followers:
-    - 1
-    - 2
-    - 6
-    - 7
+- model: polls.userfollower
+  pk: 1
+  fields:
+    followed_user: 2
+    follower: 8
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 2
+  fields:
+    followed_user: 2
+    follower: 9
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 3
+  fields:
+    followed_user: 2
+    follower: 10
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 4
+  fields:
+    followed_user: 2
+    follower: 7
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 5
+  fields:
+    followed_user: 3
+    follower: 9
+    ordering: 3.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 6
+  fields:
+    followed_user: 3
+    follower: 10
+    ordering: 5.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 7
+  fields:
+    followed_user: 3
+    follower: 4
+    ordering: 6.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 8
+  fields:
+    followed_user: 3
+    follower: 5
+    ordering: 7.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 9
+  fields:
+    followed_user: 4
+    follower: 10
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 10
+  fields:
+    followed_user: 4
+    follower: 3
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 11
+  fields:
+    followed_user: 4
+    follower: 6
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 12
+  fields:
+    followed_user: 4
+    follower: 7
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 13
+  fields:
+    followed_user: 5
+    follower: 8
+    ordering: 1.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 14
+  fields:
+    followed_user: 5
+    follower: 2
+    ordering: 4.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 15
+  fields:
+    followed_user: 5
+    follower: 10
+    ordering: 6.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 16
+  fields:
+    followed_user: 6
+    follower: 8
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 17
+  fields:
+    followed_user: 6
+    follower: 2
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 18
+  fields:
+    followed_user: 6
+    follower: 4
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 19
+  fields:
+    followed_user: 7
+    follower: 9
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 20
+  fields:
+    followed_user: 7
+    follower: 3
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 21
+  fields:
+    followed_user: 7
+    follower: 5
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 22
+  fields:
+    followed_user: 8
+    follower: 1
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 23
+  fields:
+    followed_user: 8
+    follower: 3
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 24
+  fields:
+    followed_user: 8
+    follower: 6
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 25
+  fields:
+    followed_user: 8
+    follower: 9
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 26
+  fields:
+    followed_user: 9
+    follower: 8
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 27
+  fields:
+    followed_user: 9
+    follower: 1
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 28
+  fields:
+    followed_user: 9
+    follower: 4
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 29
+  fields:
+    followed_user: 9
+    follower: 5
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 30
+  fields:
+    followed_user: 10
+    follower: 1
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 31
+  fields:
+    followed_user: 10
+    follower: 2
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 32
+  fields:
+    followed_user: 10
+    follower: 6
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.userfollower
+  pk: 33
+  fields:
+    followed_user: 10
+    follower: 7
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
 - model: polls.question
   pk: 1
   fields:
@@ -154,12 +375,6 @@
     has_max_vote_count: false
     max_vote_count: null
     allow_custom: true
-    followers:
-    - 1
-    - 2
-    - 8
-    - 4
-    - 6
 - model: polls.question
   pk: 2
   fields:
@@ -177,7 +392,6 @@
     has_max_vote_count: true
     max_vote_count: 100
     allow_custom: true
-    followers: []
 - model: polls.choice
   pk: 1
   fields:
@@ -284,3 +498,43 @@
   fields:
     question: 2
     file: 2
+- model: polls.questionfollower
+  pk: 1
+  fields:
+    question: 1
+    follower: 1
+    ordering: 1.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.questionfollower
+  pk: 2
+  fields:
+    question: 1
+    follower: 2
+    ordering: 2.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.questionfollower
+  pk: 3
+  fields:
+    question: 1
+    follower: 4
+    ordering: 3.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.questionfollower
+  pk: 4
+  fields:
+    question: 1
+    follower: 6
+    ordering: 4.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.questionfollower
+  pk: 5
+  fields:
+    question: 1
+    follower: 8
+    ordering: 5.0
+    enable_email_notify: false
+    notify_time: null

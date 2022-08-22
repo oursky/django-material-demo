@@ -17,6 +17,14 @@
 - subs_expire (subscription expire date), date (subscriber only)
 - followers, ManyToManyFieid to User
 
+## UserFollower
+
+- user (FK)
+- follower (FK)
+- ordering
+- enable_email_notify
+- enable_sms_notify
+
 ## Question
 
 - question_text, string (200 max)
@@ -55,6 +63,14 @@
 
 - question (FK)
 - file (FK)
+
+## QuestionFollower
+
+- question (FK)
+- user (FK)
+- ordering
+- enable_email_notify
+- enable_sms_notify
 
 
 # Data template
