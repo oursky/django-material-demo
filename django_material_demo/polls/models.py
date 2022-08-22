@@ -85,7 +85,7 @@ class Question(models.Model):
     max_vote_count = models.IntegerField(null=True, blank=True)
     allow_custom = models.BooleanField('allow custom votes', default=False)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.question_text
 
     @admin.display()
@@ -103,7 +103,7 @@ class Choice(models.Model):
     choice_text = models.CharField(max_length=200)
     vote_count = models.IntegerField(default=0)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.choice_text
 
 
@@ -116,7 +116,7 @@ class Vote(models.Model):
     custom_choice_text = models.CharField(
         max_length=200, null=True, blank=True)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return '#%(id)s (%(question)s)' % {'question': str(self.question),
                                            'id': str(self.pk)[:8]}
 
