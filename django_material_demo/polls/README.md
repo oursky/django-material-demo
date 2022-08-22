@@ -17,11 +17,19 @@
 - subs_expire (subscription expire date), date (subscriber only)
 - followers, ManyToManyFieid to User
 
+## UserFollower
+
+- user (FK)
+- follower (FK)
+- ordering
+- enable_email_notify
+- enable_sms_notify
+
 ## Question
 
 - question_text, string (200 max)
 - total_vote_count, int
-- thumbmail, (file FK)
+- thumbnail, (file FK)
 - creator, (user FK)
 - show_creator, boolean (name appears in poll?)
 - followers, ManyToManyFieid to User
@@ -49,12 +57,20 @@
 - timestamp, datatime
 - is_custom, boolean (is a custom choice?)
 - choice (FK, optional)
-- custom choice text, string (200 max, optional)
+- custom_choice_text, string (200 max, optional)
 
 ## Attachment
 
 - question (FK)
 - file (FK)
+
+## QuestionFollower
+
+- question (FK)
+- user (FK)
+- ordering
+- enable_email_notify
+- enable_sms_notify
 
 
 # Data template
@@ -113,6 +129,6 @@
 - vote list
     - timestamp (datetime, sort)
     - choice text (sort)
-- filter 
+- filter
     - choice (checkbox)
     - time range (datetime range)
