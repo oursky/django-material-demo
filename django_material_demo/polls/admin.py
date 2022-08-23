@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Attachment, Choice, File, Question, User, Vote
+from .models import Attachment, Choice, File, Question, User, UserFollower, Vote
 
 
 @admin.register(File)
@@ -26,7 +26,7 @@ class FollowedQuestion(admin.TabularInline):
 
 
 class FollowedUser(admin.TabularInline):
-    model = User.followers.through
+    model = UserFollower
     fk_name = 'follower'
     extra = 1
     verbose_name = 'followed user'

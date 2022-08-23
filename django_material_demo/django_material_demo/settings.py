@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'material.theme.lightgreen',
     'material',
+    'material.frontend',
     'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -133,3 +134,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_URL = "/accounts/login/"
+
+LOGIN_REDIRECT_URL = "/polls/"
+
+LOGOUT_REDIRECT_URL = "/accounts/login/"
