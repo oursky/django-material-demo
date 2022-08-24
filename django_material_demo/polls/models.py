@@ -32,17 +32,23 @@ class User(models.Model):
         'subscription expire date', null=True, blank=True)
 
     followers = models.ManyToManyField(
-        'User', blank=True, symmetrical=False, through='UserFollower')
+        'User', blank=True, symmetrical=False,
+        through='UserFollower',
+        through_fields=('followed_user', 'follower'))
 
     def __str__(self):
         return self.name
 
+    def followers_list(self):
+        users = self.followers.order_by('name', 'id')
+        return [str(x).split()[0] for x in users]
+
 
 class UserFollower(models.Model):
     followed_user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='followed')
+        User, on_delete=models.CASCADE, related_name='user_followed')
     follower = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='following')
+        User, on_delete=models.CASCADE, related_name='user_follows')
     ordering = models.FloatField(default=0)
     enable_email_notify = models.BooleanField(default=False)
     notify_time = models.TimeField(null=True, blank=True)
@@ -59,12 +65,13 @@ class Question(models.Model):
         File, on_delete=models.CASCADE, null=True, blank=True)
 
     creator = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='creates',
+        User, on_delete=models.CASCADE, related_name='question_creates',
         null=True, blank=True)
     show_creator = models.BooleanField(default=False)
 
     followers = models.ManyToManyField(
-        User, related_name='follows', blank=True, through='QuestionFollower')
+        User, related_name='question_follows',
+        through='QuestionFollower', blank=True)
 
     pub_date = models.DateTimeField('date published', default=timezone.now)
     vote_start = models.DateTimeField(
@@ -117,8 +124,9 @@ class Vote(models.Model):
         max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return '#%(id)s (%(question)s)' % {'question': str(self.question),
-                                           'id': str(self.pk)[:8]}
+        return '#%(id)s (%(question)s)' % {
+            'question': str(self.question),
+            'id': str(self.pk)[:8]}
 
     def choice_text(self):
         if self.is_custom:
