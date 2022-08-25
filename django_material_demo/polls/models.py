@@ -31,24 +31,25 @@ class User(models.Model):
     subs_expire = models.DateField(
         'subscription expire date', null=True, blank=True)
 
-    followers = models.ManyToManyField(
+    followed_users = models.ManyToManyField(
         'User', blank=True, symmetrical=False,
         through='UserFollower',
-        through_fields=('followed_user', 'follower'))
+        through_fields=('follower', 'followed_user'))
 
     def __str__(self):
         return self.name
 
     def followers_list(self):
-        users = self.followers.order_by('name', 'id')
-        return [str(x).split()[0] for x in users]
+        users = UserFollower.objects.filter(followed_user=self)
+        users = users.order_by('-ordering', 'follower__name')
+        return [x.follower.name.split()[0] for x in users]
 
 
 class UserFollower(models.Model):
-    followed_user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='user_followed')
     follower = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='user_follows')
+    followed_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='user_followed')
     ordering = models.FloatField(default=0)
     enable_email_notify = models.BooleanField(default=False)
     notify_time = models.TimeField(null=True, blank=True)
