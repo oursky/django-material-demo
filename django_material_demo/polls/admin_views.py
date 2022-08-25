@@ -1,12 +1,9 @@
-from django.db import models
 from django.forms.widgets import EmailInput, RadioSelect
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
 from material import Fieldset, Layout, Row
 from material.frontend.views import DetailModelView, ModelViewSet
 
 from .models import File, Question, User, Vote
-from .utils import CustomDetailModelView, get_html_list
+from .utils import get_html_list
 
 
 class FileViewSet(ModelViewSet):
@@ -32,12 +29,12 @@ class UserDetailModelView(DetailModelView):
             html_list = get_html_list(followed_users)
             yield ('Followed Users', html_list)
 
-        #Reverse relation
+        # Reverse relation
         followed_question = user.question_follows.order_by('question_text')
         html_list = get_html_list(followed_question)
         yield ('Followed Question', html_list or 'None')
 
-        #Relational data
+        # Relational data
         question_rel = user.questionfollower_set
         notify_time = question_rel.filter(notify_time__isnull=False)
         notify_time = notify_time.values_list('notify_time', flat=True)
@@ -63,7 +60,6 @@ class UserViewSet(ModelViewSet):
 
 class QuestionViewSet(ModelViewSet):
     model = Question
-    detail_view_class = CustomDetailModelView
     layout = Layout(
         'question_text',
         Row('total_vote_count', 'thumbnail'),
