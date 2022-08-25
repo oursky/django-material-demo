@@ -1,8 +1,12 @@
+from django.db import models
 from django.forms.widgets import EmailInput, RadioSelect
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 from material import Fieldset, Layout, Row
-from material.frontend.views import ModelViewSet
+from material.frontend.views import DetailModelView, ModelViewSet
 
 from .models import File, Question, User, Vote
+from .utils import CustomDetailModelView, get_html_list
 
 
 class FileViewSet(ModelViewSet):
@@ -16,15 +20,42 @@ class FileViewSet(ModelViewSet):
         return False
 
 
+class UserDetailModelView(DetailModelView):
+    def get_object_data(self):
+        user = super().get_object()
+        for item in super().get_object_data():
+            yield item
+
+        # M2M field
+        followed_users = user.followed_users.order_by('name')
+        if len(followed_users):
+            html_list = get_html_list(followed_users)
+            yield ('Followed Users', html_list)
+
+        #Reverse relation
+        followed_question = user.question_follows.order_by('question_text')
+        html_list = get_html_list(followed_question)
+        yield ('Followed Question', html_list or 'None')
+
+        #Relational data
+        question_rel = user.questionfollower_set
+        notify_time = question_rel.filter(notify_time__isnull=False)
+        notify_time = notify_time.values_list('notify_time', flat=True)
+        html_list = get_html_list(notify_time)
+        yield ('Question Notify Times', html_list or 'None')
+
+
 class UserViewSet(ModelViewSet):
     model = User
+    detail_view_class = UserDetailModelView
     layout = Layout(
         'name',
         'email',
         'group',
         Row('subs_start', 'subs_expire'),
-        'followers'
+        'followed_users'
     )
+
     form_widgets = {'email': EmailInput,
                     'group': RadioSelect}
     list_display = ['name', 'group', 'followers_list']
@@ -32,6 +63,7 @@ class UserViewSet(ModelViewSet):
 
 class QuestionViewSet(ModelViewSet):
     model = Question
+    detail_view_class = CustomDetailModelView
     layout = Layout(
         'question_text',
         Row('total_vote_count', 'thumbnail'),
@@ -46,8 +78,8 @@ class QuestionViewSet(ModelViewSet):
                  Row('min_selection', 'max_selection'),
                  'allow_custom'))
     form_widgets = {}
-    list_display = ['question_text', 'pub_date', 'vote_start',
-                    'vote_end', 'followers', 'selection_bounds']
+    list_display = ['question_text', 'creator', 'vote_start',
+                    'vote_end', 'selection_bounds']
 
 
 class VoteViewSet(ModelViewSet):
