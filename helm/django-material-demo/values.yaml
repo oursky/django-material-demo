@@ -65,10 +65,12 @@ tolerations: []
 affinity: {}
 
 env: |
-  SECRET_KEY=
   POSTGRES_DB=
   POSTGRES_NAME=
   POSTGRES_USER=
-  POSTGRES_PASSWORD=
   POSTGRES_HOST=
   POSTGRES_PORT=
+
+secrets: |
+  SECRET_KEY=
+  POSTGRES_PASSWORD=
