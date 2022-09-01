@@ -1,0 +1,109 @@
+{% load i18n static material_form material_frontend material_form_internal %}
+
+<div class="section row">
+  <div class="col s12">
+    <h5>{{ formset.header|default:"" }}</h5>
+    <dmc-formset>
+      <div class="formset-field col s12" data-formset-prefix="{{ formset.prefix }}" style="margin-bottom: 20px">
+        {% if not disable_add_more %}
+          <script type="form-template" data-formset-empty-form="{{ formset.prefix }}">
+            {% with form=formset.empty_form %}
+            <tr data-formset-form="{{ formset.prefix }}" style="border-bottom:none">
+              <td>
+                <div>
+                  {% if view.layout or form.layout%}
+                  {% if view.layout %}
+                  {% form layout=view.layout %}{% endform %}
+                  {% endif %}
+                  {% if form.layout %}
+                  {% form layout=form.layout %}{% endform %}
+                  {% endif %}
+                  {% else %}
+                  {% form %}{% endform %}
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                {% if not disable_delete %}
+                <div style="display:none">
+                  <input
+                    type="checkbox"
+                    name="{{ form.prefix }}-DELETE"
+                    id="id_{{ form.prefix }}-DELETE"
+                    data-formset-delete="{{ formset.prefix }}"
+                  />
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-flat white lighten-4"
+                  style="padding:0px 5px;font-size:0.7rem;height:calc(100% - 15px);width:100%"
+                  data-formset-delete-button="{{ formset.prefix }}"
+                >
+                  <i class="material-icons">delete</i>
+                </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endwith %}
+          </script>
+        {% endif %}
+        <table class="table responsive-table">
+          <tbody data-formset-body="{{ formset.prefix }}">
+            {% for form in formset %}
+            {% with form_count=forloop.counter %}
+            <tr data-formset-form="{{ formset.prefix }}" style="border-bottom:none">
+              <td>
+                <div>
+                  {% block form %}
+                  {% if view.layout or form.layout%}
+                  {% if view.layout %}
+                  {% form layout=view.layout %}{% endform %}
+                  {% endif %}
+                  {% if form.layout %}
+                  {% form layout=form.layout %}{% endform %}
+                  {% endif %}
+                  {% else %}
+                  {% form %}{% endform %}
+                  {% endif %}
+                  {% endblock %}
+                </div>
+              </td>
+              <td>
+                {% if not disable_delete %}
+                <div style="display:none">
+                  <input
+                    type="checkbox"
+                    name="{{ form.prefix }}-DELETE"
+                    id="id_{{ form.prefix }}-DELETE"
+                    data-formset-delete="{{ formset.prefix }}"
+                  />
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-flat white lighten-4"
+                  style="padding:0px 5px;font-size:0.7rem;height:calc(100% - 15px);width:100%"
+                  data-formset-delete-button="{{ formset.prefix }}"
+                >
+                  <i class="material-icons">delete</i>
+                </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if not disable_add_more %}
+        <button type="button" class="btn" style="margin-top: 15px; margin-bottom: 15px" data-formset-add="{{ formset.prefix }}">
+          {% if formset.add_more_label %}
+            {{ formset.add_more_label }}
+          {% else %}
+            Add More
+          {% endif %}
+        </button>
+        {% endif %}
+        {{ formset.management_form }}
+      </div>
+    </dmc-formset>
+  </div>
+</div>

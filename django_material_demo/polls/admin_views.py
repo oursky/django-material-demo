@@ -1,9 +1,13 @@
+from django.forms import model_to_dict
 from django.forms.widgets import EmailInput, RadioSelect
 from material import Fieldset, Layout, Row
-from material.frontend.views import DetailModelView, ModelViewSet
+from material.frontend.views import (DetailModelView, ModelViewSet,
+                                     UpdateModelView)
 
-from .models import File, Question, User, Vote
-from .utils import get_html_list
+from .library.django_superform import InlineFormSetField, SuperModelForm
+from .models import (Attachment, Choice, File, Question, QuestionFollower,
+                     User, Vote)
+from .utils import FormSetForm, get_html_list
 
 
 class FileViewSet(ModelViewSet):
@@ -58,13 +62,52 @@ class UserViewSet(ModelViewSet):
     list_display = ['name', 'group', 'followers_list']
 
 
-class QuestionViewSet(ModelViewSet):
-    model = Question
+class AttachmentsForm(FormSetForm):
+    layout = Layout('file')
+    parent_instance_field = 'question'
+
+    class Meta:
+        model = Attachment
+        fields = ['file', 'question']
+
+
+class QuestionFollowersForm(FormSetForm):
+    layout = Layout(Row('follower', 'ordering'))
+    parent_instance_field = 'question'
+
+    class Meta:
+        model = QuestionFollower
+        fields = ['follower', 'ordering', 'question']
+
+
+class ChoicesForm(FormSetForm):
+    layout = Layout(Row('choice_text', 'vote_count'))
+    parent_instance_field = 'question'
+
+    class Meta:
+        model = Choice
+        fields = ['choice_text', 'vote_count', 'question']
+
+
+class QuestionForm(SuperModelForm):
+    # Formset fields
+    attachments = InlineFormSetField(parent_model=Question,
+                                     model=Attachment,
+                                     form=AttachmentsForm, extra=0)
+
+    q_followers = InlineFormSetField(parent_model=Question,
+                                     model=QuestionFollower,
+                                     form=QuestionFollowersForm, extra=0)
+
+    choices = InlineFormSetField(parent_model=Question, model=Choice,
+                                 form=ChoicesForm, extra=0)
+
     layout = Layout(
         'question_text',
         Row('total_vote_count', 'thumbnail'),
         Row('creator', 'show_creator'),
-        'followers',
+        'attachments',
+        'q_followers',
         Fieldset('Date information',
                  'pub_date',
                  Row('vote_start', 'vote_end')),
@@ -72,8 +115,49 @@ class QuestionViewSet(ModelViewSet):
                  'show_vote',
                  Row('has_max_vote_count', 'max_vote_count'),
                  Row('min_selection', 'max_selection'),
-                 'allow_custom'))
-    form_widgets = {}
+                 'allow_custom'),
+        'choices')
+
+    class Meta:
+        model = Question
+        fields = ['question_text', 'total_vote_count', 'thumbnail',
+                  'creator', 'show_creator', 'pub_date',
+                  'vote_start', 'vote_end', 'show_vote', 'has_max_vote_count',
+                  'max_vote_count', 'min_selection', 'max_selection',
+                  'allow_custom', ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance:
+            self.initial = model_to_dict(self.instance)
+
+            attachments_queryset = self.instance.attachment_set.all()
+            self.initial["attachments"] = attachments_queryset
+            self.formsets["attachments"].queryset = attachments_queryset
+            self.formsets["attachments"].header = 'Attachments'
+
+            followers_queryset = (
+                self.instance.questionfollower_set.order_by('-ordering'))
+            self.initial["q_followers"] = followers_queryset
+            self.formsets["q_followers"].queryset = followers_queryset
+            self.formsets["q_followers"].header = 'Followers'
+
+            choices_queryset = self.instance.choice_set.all()
+            self.initial["choices"] = choices_queryset
+            self.formsets["choices"].queryset = choices_queryset
+            self.formsets["choices"].header = 'Choices'
+
+
+class QuestionUpdateView(UpdateModelView):
+    def get_form_class(self):
+        return QuestionForm
+
+
+class QuestionViewSet(ModelViewSet):
+    model = Question
+    update_view_class = QuestionUpdateView
+
     list_display = ['question_text', 'creator', 'vote_start',
                     'vote_end', 'selection_bounds']
 
