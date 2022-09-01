@@ -20,27 +20,17 @@ def get_html_list(arr):
 
 
 class FormSetForm(ModelForm):
-    parent_instance_field = None
+    parent_instance_field = ''
 
     def __init__(self, parent_instance=None,
                  get_formset=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.parent_instance = parent_instance
         self.formset = get_formset and get_formset()
 
-        if not self.initial:
-            self.initial = {
-                self.parent_instance_field: self.parent_instance.pk}
-
     def save(self, commit):
-        model = self._meta.model
-        fields = self._meta.fields
-
-        kwargs = {k: self.cleaned_data.get(k) for k in fields}
-        kwargs[self.parent_instance_field] = self.parent_instance
-
-        return model.objects.create(**kwargs)
+        setattr(self.instance, self.parent_instance_field, self.parent_instance)
+        return super().save(commit)
 
     def full_clean(self):
         super().full_clean()
