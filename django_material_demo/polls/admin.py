@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.conf import settings
+from django.contrib.auth import get_user_model
 
 from .models import Attachment, Choice, File, Question, User, UserFollower, Vote
 
@@ -35,15 +37,16 @@ class FollowedUser(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     fields = [
-        'name', 'email', 'group',
+        'account',
+        'group',
         ('subs_start', 'subs_expire'),
     ]
     inlines = [FollowedQuestion, FollowedUser]
     radio_fields = {"group": admin.HORIZONTAL}
 
-    list_display = ['name', 'group', 'subs_start', 'subs_expire']
+    list_display = ['account', 'group', 'subs_start', 'subs_expire']
     list_filter = ['group']
-    search_fields = ['name']
+    search_fields = ['account']
 
 
 class ChoiceInline(admin.TabularInline):

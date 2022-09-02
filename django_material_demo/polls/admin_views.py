@@ -28,7 +28,7 @@ class UserDetailModelView(DetailModelView):
             yield item
 
         # M2M field
-        followed_users = user.followed_users.order_by('name')
+        followed_users = user.followed_users.order_by('account__username')
         if len(followed_users):
             html_list = get_html_list(followed_users)
             yield ('Followed Users', html_list)
@@ -50,16 +50,14 @@ class UserViewSet(ModelViewSet):
     model = User
     detail_view_class = UserDetailModelView
     layout = Layout(
-        'name',
-        'email',
+        'account',
         'group',
         Row('subs_start', 'subs_expire'),
         'followed_users'
     )
 
-    form_widgets = {'email': EmailInput,
-                    'group': RadioSelect}
-    list_display = ['name', 'group', 'followers_list']
+    form_widgets = {'group': RadioSelect}
+    list_display = ['account', 'group', 'followers_list']
 
 
 class AttachmentsForm(FormSetForm):
