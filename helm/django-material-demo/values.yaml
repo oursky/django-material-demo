@@ -65,7 +65,6 @@ tolerations: []
 affinity: {}
 
 env: |
-  POSTGRES_DB=
   POSTGRES_NAME=
   POSTGRES_USER=
   POSTGRES_HOST=
