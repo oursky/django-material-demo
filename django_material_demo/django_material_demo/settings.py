@@ -32,6 +32,11 @@ DEBUG = str(os.getenv('DEBUG')).lower() in ['true', 'yes', '1']
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS_STR = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+if CSRF_TRUSTED_ORIGINS_STR:
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_STR.split(',')
+
 # Application definition
 
 INSTALLED_APPS = [
