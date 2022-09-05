@@ -1,8 +1,8 @@
 from django.forms import model_to_dict
 from django.forms.widgets import EmailInput, RadioSelect
 from material import Fieldset, Layout, Row
-from material.frontend.views import (DetailModelView, ModelViewSet,
-                                     UpdateModelView)
+from material.frontend.views import (CreateModelView, DetailModelView,
+                                     ModelViewSet, UpdateModelView)
 
 from .library.django_superform import InlineFormSetField, SuperModelForm
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
@@ -129,24 +129,30 @@ class QuestionForm(SuperModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.instance:
+        self.formsets["attachments"].header = 'Attachments'
+        self.formsets["q_followers"].header = 'Followers'
+        self.formsets["choices"].header = 'Choices'
+
+        if self.instance and self.instance.id:
             self.initial = model_to_dict(self.instance)
 
             attachments_queryset = self.instance.attachment_set.all()
             self.initial["attachments"] = attachments_queryset
             self.formsets["attachments"].queryset = attachments_queryset
-            self.formsets["attachments"].header = 'Attachments'
 
             followers_queryset = (
                 self.instance.questionfollower_set.order_by('-ordering'))
             self.initial["q_followers"] = followers_queryset
             self.formsets["q_followers"].queryset = followers_queryset
-            self.formsets["q_followers"].header = 'Followers'
 
             choices_queryset = self.instance.choice_set.all()
             self.initial["choices"] = choices_queryset
             self.formsets["choices"].queryset = choices_queryset
-            self.formsets["choices"].header = 'Choices'
+
+
+class QuestionCreateView(CreateModelView):
+    def get_form_class(self):
+        return QuestionForm
 
 
 class QuestionUpdateView(UpdateModelView):
@@ -156,6 +162,7 @@ class QuestionUpdateView(UpdateModelView):
 
 class QuestionViewSet(ModelViewSet):
     model = Question
+    create_view_class = QuestionCreateView
     update_view_class = QuestionUpdateView
 
     list_display = ['question_text', 'creator', 'vote_start',
