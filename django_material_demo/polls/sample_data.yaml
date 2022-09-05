@@ -15,82 +15,62 @@
     file_type: image/png
     file_size: 148743
 - model: polls.user
-  pk: 1
-  fields:
-    name: Perry Joyce
-    email: perry_joyce@email.com
-    group: SA
-    subs_start: null
-    subs_expire: null
-- model: polls.user
-  pk: 2
-  fields:
-    name: Montana Ross
-    email: montana_ross@email.com
-    group: SA
-    subs_start: null
-    subs_expire: null
-- model: polls.user
   pk: 3
   fields:
-    name: Kristi Armitage
-    email: kristi_armitage@email.com
-    group: DEFAULT
+    group: SA
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 4
   fields:
-    name: Alexis Castillo
-    email: alexis_castillo@email.com
-    group: DEFAULT
+    group: SA
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 5
   fields:
-    name: Tashan Gilliam
-    email: tashan_gilliam@email.com
     group: DEFAULT
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 6
   fields:
-    name: Glen Blake
-    email: glen_blake@email.com
-    group: SUBS
-    subs_start: 2022-08-16
-    subs_expire: 2022-10-19
+    group: DEFAULT
+    subs_start: null
+    subs_expire: null
 - model: polls.user
   pk: 7
   fields:
-    name: Dru Ramsey
-    email: dru_ramsey@email.com
     group: DEFAULT
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 8
   fields:
-    name: Verity Alexander
-    email: verity_alexander@email.com
+    group: SUBS
+    subs_start: 2022-08-16
+    subs_expire: 2022-10-19
+- model: polls.user
+  pk: 9
+  fields:
+    group: DEFAULT
+    subs_start: null
+    subs_expire: null
+- model: polls.user
+  pk: 10
+  fields:
     group: SUBS
     subs_start: 2022-07-13
     subs_expire: 2022-11-29
 - model: polls.user
-  pk: 9
+  pk: 11
   fields:
-    name: Codie Palacios
-    email: codie_palacios@email.com
     group: SUBS
     subs_start: 2022-05-10
     subs_expire: 2022-09-19
 - model: polls.user
-  pk: 10
+  pk: 12
   fields:
-    name: Kacie Keenan
-    email: kacie_keenan@email.com
     group: DEFAULT
     subs_start: null
     subs_expire: null
@@ -340,7 +320,7 @@
     question_text: What's up?
     total_vote_count: 6
     thumbnail: null
-    creator: 1
+    creator: 3
     show_creator: false
     pub_date: 2022-08-12 03:35:51+00:00
     vote_start: 2022-08-18 11:20:20+00:00
@@ -373,12 +353,6 @@
   fields:
     question: 1
     choice_text: Not much
-    vote_count: 3
-- model: polls.choice
-  pk: 2
-  fields:
-    question: 1
-    choice_text: The sky
     vote_count: 3
 - model: polls.choice
   pk: 3
@@ -416,6 +390,12 @@
     question: 2
     choice_text: White
     vote_count: 0
+- model: polls.choice
+  pk: 13
+  fields:
+    question: 1
+    choice_text: The sky
+    vote_count: 3
 - model: polls.vote
   pk: 1
   fields:
@@ -423,14 +403,6 @@
     timestamp: 2022-08-19 04:17:50+00:00
     is_custom: false
     choice: 1
-    custom_choice_text: null
-- model: polls.vote
-  pk: 2
-  fields:
-    question: 1
-    timestamp: 2022-08-19 04:18:10+00:00
-    is_custom: false
-    choice: 2
     custom_choice_text: null
 - model: polls.vote
   pk: 3
@@ -465,61 +437,16 @@
     choice: null
     custom_choice_text: Violet
 - model: polls.attachment
-  pk: 1
-  fields:
-    question: 1
-    file: 1
-- model: polls.attachment
   pk: 2
   fields:
     question: 2
     file: 2
-- model: polls.questionfollower
-  pk: 3
-  fields:
-    question: 1
-    follower: 4
-    ordering: 3.0
-    enable_email_notify: false
-    notify_time: 08:48:00
 - model: polls.questionfollower
   pk: 4
   fields:
     question: 1
     follower: 6
     ordering: 4.0
-    enable_email_notify: false
-    notify_time: null
-- model: polls.questionfollower
-  pk: 10
-  fields:
-    question: 1
-    follower: 9
-    ordering: 0.0
-    enable_email_notify: false
-    notify_time: 08:55:09
-- model: polls.questionfollower
-  pk: 11
-  fields:
-    question: 1
-    follower: 10
-    ordering: 0.0
-    enable_email_notify: false
-    notify_time: null
-- model: polls.questionfollower
-  pk: 12
-  fields:
-    question: 1
-    follower: 3
-    ordering: 0.0
-    enable_email_notify: false
-    notify_time: null
-- model: polls.questionfollower
-  pk: 13
-  fields:
-    question: 1
-    follower: 7
-    ordering: 0.0
     enable_email_notify: false
     notify_time: null
 - model: polls.questionfollower
@@ -559,6 +486,22 @@
   fields:
     question: 2
     follower: 5
+    ordering: 0.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.questionfollower
+  pk: 30
+  fields:
+    question: 1
+    follower: 6
+    ordering: 2.0
+    enable_email_notify: false
+    notify_time: null
+- model: polls.questionfollower
+  pk: 31
+  fields:
+    question: 1
+    follower: 1
     ordering: 0.0
     enable_email_notify: false
     notify_time: null
