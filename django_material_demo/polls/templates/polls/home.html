@@ -1,18 +1,18 @@
-{% block title %}Polls{% endblock %}
-{% block page_title %}Poll List{% endblock %}
+{% include './includes/top_nav.html' %}
 
-{% block breadcrumbs_items %}
-    <a class="active">Polls</a>
-{% endblock %}
+<p>
+    <a class="active">Home</a>
+</p>
 
-{% block main_content %}
+<fieldset>
+    <legend><h1>Polls</h1></legend>
     {% if latest_question_list %}
-    <ul>
-        {% for question in latest_question_list %}
-        <li><a href="{% url 'polls:question' question.id %}">{{ question.question_text }}</a></li>
-        {% endfor %}
-    </ul>
+        <ul>
+            {% for question in latest_question_list %}
+            <li><a href="{% url 'polls:question' question.id %}">{{ question.question_text }}</a></li>
+            {% endfor %}
+        </ul>
     {% else %}
-    <p>No polls are available.</p>
+        <p>No polls are available.</p>
     {% endif %}
-{% endblock %}
+</fieldset>

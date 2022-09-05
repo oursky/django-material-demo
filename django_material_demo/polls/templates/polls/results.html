@@ -1,20 +1,19 @@
-{% block title %}Results | Polls{% endblock %}
-{% block page_title %}Poll Result{% endblock %}
+{% include './includes/top_nav.html' %}
 
-{% block breadcrumbs_items %}
-    <a href={% url 'polls:home' %}>Polls</a>
-    <a href={% url 'polls:question' question.id %}>{{ question.question_text }}</a>
+<p>
+    <a href={% url 'polls:home' %}>Home</a> >
+    <a href={% url 'polls:question' question.id %}>{{ question.question_text }}</a> >
     <a class="active">Results</a>
-{% endblock %}
+</p>
 
-{% block main_content %}
-<h1>{{ question.question_text }}</h1>
-<br>
-<ul>
-{% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }} -- {{ choice.vote_count }} vote{{ choice.vote_count|pluralize }}</li>
-{% endfor %}
-</ul>
-<br>
+<fieldset>
+    <legend><h1>{{ question.question_text }}</h1></legend>
+    <h2>Results</h2>
+    <ul>
+        {% for choice in question.choice_set.all %}
+            <li>{{ choice.choice_text }} -- {{ choice.vote_count }} vote{{ choice.vote_count|pluralize }}</li>
+        {% endfor %}
+    </ul>
+</fieldset>
+
 <a href="{% url 'polls:question' question.id %}">Vote again?</a>
-{% endblock %}
