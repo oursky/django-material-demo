@@ -112,8 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = ['polls.backends.EmailAuthBackend',
-                           'django.contrib.auth.backends.ModelBackend']
+AUTHENTICATION_BACKENDS = ['polls.backends.EmailAuthBackend']
 
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/polls/"

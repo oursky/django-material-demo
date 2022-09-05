@@ -5,13 +5,13 @@ UserModel = get_user_model()
 
 
 class EmailAuthBackend(ModelBackend):
-    def authenticate(self, request, username=None, password=None, **kwargs):
-        if username is None:
-            username = kwargs.get(UserModel.EMAIL_FIELD)
-        if username is None or password is None:
+    def authenticate(self, request, email=None, password=None, **kwargs):
+        if email is None:
+            email = kwargs.get(UserModel.EMAIL_FIELD)
+        if email is None or password is None:
             return
         try:
-            user = UserModel.objects.get(email__iexact=username)
+            user = UserModel.objects.get(email__iexact=email)
         except (UserModel.DoesNotExist, UserModel.MultipleObjectsReturned):
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a nonexistent user (#20760).
