@@ -16,8 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from material.frontend import urls as frontend_urls
+from django.contrib.auth.views import LoginView
+from polls.forms import EmailLoginForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Override login page from Frontend
+    path('accounts/login/', LoginView.as_view(
+        authentication_form=EmailLoginForm),
+        name="login"
+    ),
     path('', include(frontend_urls)),
 ]
