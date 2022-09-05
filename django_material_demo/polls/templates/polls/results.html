@@ -1,11 +1,9 @@
-{% extends 'material/frontend/base_site.html' %}
-
 {% block title %}Results | Polls{% endblock %}
 {% block page_title %}Poll Result{% endblock %}
 
 {% block breadcrumbs_items %}
-    <a href={% url 'polls:index' %}>Polls</a>
-    <a href={% url 'polls:detail' question.id %}>{{ question.question_text }}</a>
+    <a href={% url 'polls:home' %}>Polls</a>
+    <a href={% url 'polls:question' question.id %}>{{ question.question_text }}</a>
     <a class="active">Results</a>
 {% endblock %}
 
@@ -18,5 +16,5 @@
 {% endfor %}
 </ul>
 <br>
-<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+<a href="{% url 'polls:question' question.id %}">Vote again?</a>
 {% endblock %}

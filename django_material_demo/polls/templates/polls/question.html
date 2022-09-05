@@ -1,10 +1,8 @@
-{% extends 'material/frontend/base_site.html' %}
-
 {% block title %}Detail | Polls{% endblock %}
 {% block page_title %}Question #{{ question.id }}{% endblock %}
 
 {% block breadcrumbs_items %}
-    <a href={% url 'polls:index' %}>Poll List</a>
+    <a href={% url 'polls:home' %}>Poll List</a>
     <a class="active">{{ question.question_text }}</a>
 {% endblock %}
 
