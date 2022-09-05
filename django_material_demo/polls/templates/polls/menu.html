@@ -1,10 +1,7 @@
-{% if perms.is_staff %}
 {% comment %} https://materializecss.com/sidenav.html {% endcomment %}
 <ul>
-    <li><a class="subheader">- Admin Portal -</a></li>
     <li><a href="{% url 'polls:user_list' %}">User List</a></li>
     <li><a href="{% url 'polls:file_list' %}">File List</a></li>
     <li><a href="{% url 'polls:question_list' %}">Question List</a></li>
     <li><a href="{% url 'polls:vote_list' %}">Vote List</a></li>
 </ul>
-{% endif %}

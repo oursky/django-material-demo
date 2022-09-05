@@ -3,3 +3,13 @@
 
 {% block title %}{% trans "Polls" %}{% endblock %}
 {% block page_title %}{% trans "Polls" %}{% endblock %}
+
+{% block sidenav_items %}
+    {{ block.super }}
+    <li>
+        <a target="_blank" href="{% url 'polls:home' %}" class="collapsible-header">
+            Open Homepage
+            <i class="material-icons">open_in_new</i>
+        </a>
+    </li>
+{% endblock %}
