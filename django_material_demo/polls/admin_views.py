@@ -1,10 +1,12 @@
-from django.forms import model_to_dict
-from django.forms.widgets import EmailInput, RadioSelect
+from django.contrib.auth import get_user_model
+from django.forms import EmailField, ModelForm, model_to_dict
+from django.forms.widgets import RadioSelect
 from material import Fieldset, Layout, Row
 from material.frontend.views import (DetailModelView, ModelViewSet,
                                      UpdateModelView)
 
-from .library.django_superform import InlineFormSetField, SuperModelForm
+from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
+                                       SuperModelForm)
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      User, Vote)
 from .utils import FormSetForm, get_html_list
@@ -19,6 +21,47 @@ class FileViewSet(ModelViewSet):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+class AccountForm(ModelForm):
+    email = EmailField(required=True)
+
+    layout = Layout(
+        'username',
+        'email',
+    )
+    parent_instance_field = 'user'
+
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'email']
+
+
+class UserForm(SuperModelForm):
+    account = ForeignKeyFormField(AccountForm)
+
+    layout = Layout(
+        'account',
+        'group',
+        Row('subs_start', 'subs_expire'),
+        'followed_users'
+    )
+
+    form_widgets = {'group': RadioSelect}
+
+    class Meta:
+        model = User
+        fields = ['group', 'subs_start', 'subs_expire',
+                  'followed_users']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance:
+            self.initial = model_to_dict(self.instance)
+
+            account_queryset = self.instance.account
+            self.initial["account"] = account_queryset
 
 
 class UserDetailModelView(DetailModelView):
@@ -46,17 +89,15 @@ class UserDetailModelView(DetailModelView):
         yield ('Question Notify Times', html_list or 'None')
 
 
+class UserUpdateModelView(UpdateModelView):
+    def get_form_class(self):
+        return UserForm
+
 class UserViewSet(ModelViewSet):
     model = User
     detail_view_class = UserDetailModelView
-    layout = Layout(
-        'account',
-        'group',
-        Row('subs_start', 'subs_expire'),
-        'followed_users'
-    )
+    update_view_class = UserUpdateModelView
 
-    form_widgets = {'group': RadioSelect}
     list_display = ['account', 'group', 'followers_list']
 
 
