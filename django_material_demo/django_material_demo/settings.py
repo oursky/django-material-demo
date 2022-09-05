@@ -112,6 +112,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = ['polls.backends.EmailAuthBackend',
+                           'django.contrib.auth.backends.ModelBackend']
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/polls/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -134,10 +140,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-LOGIN_URL = "/accounts/login/"
-
-LOGIN_REDIRECT_URL = "/polls/"
-
-LOGOUT_REDIRECT_URL = "/accounts/login/"
