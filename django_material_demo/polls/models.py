@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.db import models
 from django.utils import timezone
@@ -15,8 +16,8 @@ class File(models.Model):
 
 
 class User(models.Model):
-    name = models.CharField(max_length=50)
-    email = models.CharField(max_length=100)
+    account = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Group(models.TextChoices):
         DEFAULT = 'DEFAULT', 'default'
@@ -37,12 +38,20 @@ class User(models.Model):
         through_fields=('follower', 'followed_user'))
 
     def __str__(self):
-        return self.name
+        return self.account.username
+
+    @property
+    def name(self):
+        return self.account.username
+
+    @property
+    def email(self):
+        return self.account.email
 
     def followers_list(self):
         users = UserFollower.objects.filter(followed_user=self)
-        users = users.order_by('-ordering', 'follower__name')
-        return [x.follower.name.split()[0] for x in users]
+        users = users.order_by('-ordering', 'follower__account__username')
+        return [x.follower.name for x in users]
 
 
 class UserFollower(models.Model):

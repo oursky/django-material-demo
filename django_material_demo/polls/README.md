@@ -10,8 +10,7 @@
 
 ## User
 
-- name, string (50 max)
-- email, string (100 max)
+- account, OneToOneField to auth user model
 - group, choice (default, subscriber, super admin)
 - subs_start (subscription start date), date (subscriber only)
 - subs_expire (subscription expire date), date (subscriber only)
@@ -77,16 +76,16 @@
 
 ## User List Page
 
-- name (sort)
+- account (sort)
 - group (sort)
 - search
-    - name
+    - account
 - filter
     - group (list)
 
 ## User Detail/Edit Page
 
-- name (text)
+- account (select)
 - email (text)
 - group (radio, default/subscriber/super admin)
 - subscription start date (date, subscriber only)

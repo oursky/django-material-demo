@@ -1,10 +1,12 @@
-from django.forms import model_to_dict
-from django.forms.widgets import EmailInput, RadioSelect
+from django.contrib.auth import get_user_model
+from django.forms import EmailField, ModelForm, model_to_dict
+from django.forms.widgets import RadioSelect
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ModelViewSet, UpdateModelView)
 
-from .library.django_superform import InlineFormSetField, SuperModelForm
+from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
+                                       SuperModelForm)
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      User, Vote)
 from .utils import FormSetForm, get_html_list
@@ -21,6 +23,47 @@ class FileViewSet(ModelViewSet):
         return False
 
 
+class AccountForm(ModelForm):
+    email = EmailField(required=True)
+
+    layout = Layout(
+        'username',
+        'email',
+    )
+    parent_instance_field = 'user'
+
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'email']
+
+
+class UserForm(SuperModelForm):
+    account = ForeignKeyFormField(AccountForm)
+
+    layout = Layout(
+        'account',
+        'group',
+        Row('subs_start', 'subs_expire'),
+        'followed_users'
+    )
+
+    form_widgets = {'group': RadioSelect}
+
+    class Meta:
+        model = User
+        fields = ['group', 'subs_start', 'subs_expire',
+                  'followed_users']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance:
+            self.initial = model_to_dict(self.instance)
+
+            account_queryset = self.instance.account
+            self.initial["account"] = account_queryset
+
+
 class UserDetailModelView(DetailModelView):
     def get_object_data(self):
         user = super().get_object()
@@ -28,7 +71,7 @@ class UserDetailModelView(DetailModelView):
             yield item
 
         # M2M field
-        followed_users = user.followed_users.order_by('name')
+        followed_users = user.followed_users.order_by('account__username')
         if len(followed_users):
             html_list = get_html_list(followed_users)
             yield ('Followed Users', html_list)
@@ -46,20 +89,16 @@ class UserDetailModelView(DetailModelView):
         yield ('Question Notify Times', html_list or 'None')
 
 
+class UserUpdateModelView(UpdateModelView):
+    def get_form_class(self):
+        return UserForm
+
 class UserViewSet(ModelViewSet):
     model = User
     detail_view_class = UserDetailModelView
-    layout = Layout(
-        'name',
-        'email',
-        'group',
-        Row('subs_start', 'subs_expire'),
-        'followed_users'
-    )
+    update_view_class = UserUpdateModelView
 
-    form_widgets = {'email': EmailInput,
-                    'group': RadioSelect}
-    list_display = ['name', 'group', 'followers_list']
+    list_display = ['account', 'group', 'followers_list']
 
 
 class AttachmentsForm(FormSetForm):

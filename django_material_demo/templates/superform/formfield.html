@@ -1,1 +1,12 @@
-{{ form }}
+{% load i18n static material_form material_frontend material_form_internal %}
+
+{% if view.layout or form.layout%}
+{% if view.layout %}
+{% form layout=view.layout %}{% endform %}
+{% endif %}
+{% if form.layout %}
+{% form layout=form.layout %}{% endform %}
+{% endif %}
+{% else %}
+{% form %}{% endform %}
+{% endif %}

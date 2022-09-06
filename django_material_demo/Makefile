@@ -14,7 +14,7 @@ setup: secret
 	docker compose up --build --no-start
 	make migrate
 	make load-data
-	
+
 .PHONY: start
 start:
 	docker compose up
@@ -33,7 +33,7 @@ migrate:
 
 .PHONY: load-data
 load-data:
-	docker compose run --rm web python manage.py loaddata polls/sample_data.yaml
+	docker compose run --rm web python manage.py loaddata polls/sample_data.yaml sample_user_data.yaml
 
 .PHONY: create-superuser
 create-superuser:
