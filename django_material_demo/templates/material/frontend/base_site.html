@@ -7,6 +7,12 @@
 {% block sidenav_items %}
     {{ block.super }}
     <li>
+        <a href="{% url 'polls:settings' %}" class="collapsible-header" data-turbolink="false">
+            Settings
+            <i class="material-icons">settings</i>
+        </a>
+    </li>
+    <li>
         <a target="_blank" href="{% url 'polls:home' %}" class="collapsible-header">
             Open Homepage
             <i class="material-icons">open_in_new</i>

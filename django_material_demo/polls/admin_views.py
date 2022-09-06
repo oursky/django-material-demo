@@ -1,15 +1,20 @@
+from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, EmailField, ModelForm,
                           model_to_dict)
 from django.forms.widgets import RadioSelect
+from django.views.generic.edit import FormView
+from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ModelViewSet, UpdateModelView)
 
 from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                        SuperModelForm)
-from .models import (Attachment, Choice, File, Question, QuestionFollower,
+from .models import (Attachment, Choice, File, Question, QuestionFollower, Settings,
                      User, Vote)
 from .utils import FormSetForm, get_html_list
 
@@ -321,3 +326,27 @@ class VoteViewSet(ModelViewSet):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+class SettingsForm(forms.Form):
+    primary_color = forms.CharField(
+        label='Primary color', required=False,
+        widget=forms.TextInput(attrs={'placeholder': '#424242'}))
+
+
+@method_decorator(staff_member_required(login_url='login'), name='dispatch')
+class SettingsView(FormView):
+    form_class = SettingsForm
+    template_name = 'polls/settings.html'
+
+    def get_initial(self):
+        return model_to_dict(Settings.from_request(self.request))
+
+    def form_valid(self, form):
+        settings = Settings.from_request(self.request)
+        for k, v in form.cleaned_data.items():
+            setattr(settings, k, v)
+
+        response = redirect('polls:settings')
+        settings.save(response)
+        return response

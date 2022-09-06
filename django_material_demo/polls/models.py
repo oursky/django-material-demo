@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from django.conf import settings
 from django.contrib import admin
 from django.db import models
@@ -162,3 +163,18 @@ class QuestionFollower(models.Model):
 
     def __str__(self):
         return str(self.follower) + ' → ' + str(self.question)
+
+
+class Settings(models.Model):
+    managed = False
+
+    primary_color = models.TextField()
+
+    @classmethod
+    def from_request(cls, request):
+        return cls(
+            primary_color=request.COOKIES.get('settings:primary_color')
+            )
+
+    def save(self, response):
+        response.set_cookie('settings:primary_color', self.primary_color)
