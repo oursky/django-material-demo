@@ -1,3 +1,220 @@
+/* primary color */
+
+.primary {
+  background-color: var(--primary-color);
+}
+.primary-light {
+  background-color: var(--primary-color-light);
+}
+.primary-dark {
+  background-color: var(--primary-color-dark);
+}
 .sidenav .user-view .background {
-    background-color: var(--primary-color);
+  background-color: var(--primary-color-light);
+}
+blockquote {
+  border-left-color: var(--primary-color);
+}
+.pagination li.active {
+  background-color: var(--primary-color);
+}
+.page-footer {
+  background-color: var(--primary-color);
+}
+nav {
+  background-color: var(--primary-color);
+}
+.tabs .tab a:hover, .tabs .tab a.active {
+  color: var(--primary-color);
+}
+.table-of-contents a:hover {
+  border-left-color: var(--primary-color);
+}
+.table-of-contents a.active {
+  border-left-color: var(--primary-color);
+}
+.sidenav .collapsible-body > ul:not(.collapsible) > li.active,
+.sidenav.sidenav-fixed .collapsible-body > ul:not(.collapsible) > li.active {
+  background-color: var(--primary-color);
+}
+.tap-target {
+  background-color: var(--primary-color);
+}
+
+/* secondary color */
+
+.secondary {
+  background-color: var(--secondary-color);
+}
+.collection .collection-item.active {
+  background-color: var(--secondary-color);
+}
+.collection a.collection-item {
+  color: var(--secondary-color);
+}
+.secondary-content {
+  color: var(--secondary-color);
+}
+.progress .determinate {
+  background-color: var(--secondary-color);
+}
+.progress .indeterminate {
+  background-color: var(--secondary-color);
+}
+span.badge.new {
+  background-color: var(--secondary-color);
+}
+.btn, .btn-small, .btn-large {
+  background-color: var(--secondary-color);
+}
+.btn-floating {
+  background-color: var(--secondary-color);
+}
+.btn-floating:hover {
+  background-color: var(--secondary-color);
+}
+.fixed-action-btn .fab-backdrop {
+  background-color: var(--secondary-color);
+}
+.dropdown-content li > a, .dropdown-content li > span {
+  color: var(--secondary-color);
+}
+textarea.materialize-textarea:focus:not([readonly]) {
+  border-bottom-color: var(--secondary-color);
+  box-shadow: 0 1px 0 0 var(--secondary-color);
+}
+textarea.materialize-textarea:focus:not([readonly]) + label {
+  color: var(--secondary-color);
+}
+
+.input-field .prefix.active {
+  color: var(--secondary-color);
+}
+[type=radio]:checked + span:after,
+[type=radio].with-gap:checked + span:before,
+[type=radio].with-gap:checked + span:after {
+  border-color: var(--secondary-color);
+}
+
+[type=radio]:checked + span:after,
+[type=radio].with-gap:checked + span:after {
+  background-color: var(--secondary-color);
+}
+
+[type=checkbox]:checked + span:not(.lever):before {
+  border-right-color: var(--secondary-color);
+  border-bottom-color: var(--secondary-color);
+}
+[type=checkbox]:indeterminate + span:not(.lever):before {
+  border-right-color: var(--secondary-color);
+}
+[type=checkbox].filled-in:checked + span:not(.lever):after {
+  border-color: var(--secondary-color);
+  background-color: var(--secondary-color);
+}
+[type=checkbox].filled-in.tabbed:checked:focus + span:not(.lever):after {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+.switch label input[type=checkbox]:checked + .lever:after {
+  background-color: var(--secondary-color);
+}
+.select-wrapper input.select-dropdown:focus {
+  border-bottom-color: var(--secondary-color);
+}
+input[type=range] + .thumb {
+  background-color: var(--secondary-color);
+}
+input[type=range] + .thumb .value {
+  color: var(--secondary-color);
+}
+input[type=range]::-webkit-slider-thumb {
+  background: var(--secondary-color);
+  background-color: var(--secondary-color);
+}
+input[type=range]::-moz-range-thumb {
+  background: var(--secondary-color);
+}
+input[type=range]::-ms-thumb {
+  background: var(--secondary-color);
+}
+.sidenav li > a.btn-floating:hover {
+  background-color: var(--secondary-color);
+}
+.spinner-layer {
+  border-color: var(--secondary-color);
+}
+.datepicker-date-display {
+  background-color: var(--secondary-color);
+}
+.datepicker-table td.is-today {
+  color: var(--secondary-color);
+}
+.datepicker-table td.is-selected {
+  background-color: var(--secondary-color);
+}
+.datepicker-cancel,
+.datepicker-clear,
+.datepicker-today,
+.datepicker-done {
+  color: var(--secondary-color);
+}
+.timepicker-digital-display {
+  background-color: var(--secondary-color);
+}
+.timepicker-canvas line {
+  stroke: var(--secondary-color);
+}
+.timepicker-canvas-bearing {
+  fill: var(--secondary-color);
+}
+.timepicker-canvas-bg {
+  fill: var(--secondary-color);
+}
+.timepicker-close {
+  color: var(--secondary-color);
+}
+
+/* success color */
+
+.success {
+  color: var(--success-color);
+}
+textarea.materialize-textarea:focus.valid ~ label {
+  color: var(--success-color);
+}
+textarea.materialize-textarea:focus.valid {
+  border-bottom-color: var(--success-color);
+  box-shadow: 0 1px 0 0 var(--success-color);
+}
+textarea.materialize-textarea:focus.valid ~ .helper-text:after {
+  color: var(--success-color);
+}
+
+/* error color */
+
+.error {
+  color: var(--error-color);
+}
+textarea.materialize-textarea:focus.invalid ~ label {
+  color: var(--error-color);
+}
+textarea.materialize-textarea:focus.invalid {
+  border-bottom-color: var(--error-color);
+  box-shadow: 0 1px 0 0 var(--error-color);
+}
+textarea.materialize-textarea:focus.invalid ~ .helper-text:after {
+  color: var(--error-color);
+}
+.datepicker-clear {
+  color: var(--error-color);
+}
+.timepicker-clear {
+  color: var(--error-color);
+}
+
+/* link color */
+
+a {
+  color: var(--link-color);
 }
