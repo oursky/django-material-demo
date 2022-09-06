@@ -1,0 +1,21 @@
+{% include './includes/top_nav.html' %}
+
+<p>
+    <a href={% url 'polls:home' %}>Home</a> >
+    <a class="active">{{ question.question_text }}</a>
+</p>
+
+<form action="{% url 'polls:vote' question.id %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>{{ question.question_text }}</h1></legend>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% for choice in question.choice_set.all %}
+            <label for="choice{{ forloop.counter }}">
+                <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                <span>{{ choice.choice_text }}</span>
+            </label><br>
+        {% endfor %}
+    </fieldset>
+    <input type="submit" value="Vote">
+</form>

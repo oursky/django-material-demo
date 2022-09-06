@@ -7,8 +7,8 @@ from django.views import generic
 from .models import Choice, Question
 
 
-class IndexView(generic.ListView):
-    template_name = 'polls/index.html'
+class HomeView(generic.ListView):
+    template_name = 'polls/home.html'
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
@@ -16,9 +16,9 @@ class IndexView(generic.ListView):
         return Question.objects.order_by('-pub_date')[:5]
 
 
-class DetailView(generic.DetailView):
+class QuestionView(generic.DetailView):
     model = Question
-    template_name = 'polls/detail.html'
+    template_name = 'polls/question.html'
 
     def get_queryset(self):
         """
@@ -38,7 +38,7 @@ def vote(request, question_id):
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        return render(request, 'polls/detail.html', {
+        return render(request, 'polls/question.html', {
             'question': question,
             'error_message': "You didn't select a choice.",
         })
