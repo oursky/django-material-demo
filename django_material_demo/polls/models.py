@@ -17,7 +17,7 @@ class File(models.Model):
 
 class User(models.Model):
     account = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Group(models.TextChoices):
         DEFAULT = 'DEFAULT', 'default'

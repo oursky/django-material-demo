@@ -68,4 +68,11 @@ class Migration(migrations.Migration):
             model_name='user',
             name='name',
         ),
+        migrations.AlterField(
+            model_name='user',
+            name='account',
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL),
+        ),
     ]
