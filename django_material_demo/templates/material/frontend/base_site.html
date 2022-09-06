@@ -1,5 +1,19 @@
 {% extends 'material/frontend/base.html' %}
-{% load i18n %}
+{% load i18n static settings %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        var r = document.querySelector(':root');
+        var primaryColor = "{% get_setting request 'primary_color' %}";
+        r.style.setProperty('--primary-color', primaryColor);
+    </script>
+{% endblock %}
 
 {% block title %}{% trans "Polls" %}{% endblock %}
 {% block page_title %}{% trans "Polls" %}{% endblock %}

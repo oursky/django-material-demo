@@ -340,13 +340,12 @@ class SettingsView(FormView):
     template_name = 'polls/settings.html'
 
     def get_initial(self):
-        return model_to_dict(Settings.from_request(self.request))
+        return model_to_dict(Settings(session=self.request.session))
 
     def form_valid(self, form):
-        settings = Settings.from_request(self.request)
+        settings = Settings(session=self.request.session)
         for k, v in form.cleaned_data.items():
             setattr(settings, k, v)
 
-        response = redirect('polls:settings')
-        settings.save(response)
-        return response
+        settings.save()
+        return redirect('polls:settings')

@@ -170,11 +170,14 @@ class Settings(models.Model):
 
     primary_color = models.TextField()
 
-    @classmethod
-    def from_request(cls, request):
-        return cls(
-            primary_color=request.COOKIES.get('settings:primary_color')
-            )
+    def __init__(self, *args, **kwargs):
+        self.session = kwargs['session']
+        del kwargs['session']
+        super().__init__(*args, **kwargs)
+        self.load()
 
-    def save(self, response):
-        response.set_cookie('settings:primary_color', self.primary_color)
+    def load(self):
+        self.primary_color = self.session.get('settings:--primary-color') or '#424242'
+
+    def save(self):
+        self.session['settings:--primary-color'] = self.primary_color
