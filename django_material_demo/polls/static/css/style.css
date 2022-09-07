@@ -40,6 +40,12 @@ nav {
 .tap-target {
   background-color: var(--primary-color);
 }
+.sidenav-fixed .collapsible-body li .collapsible-body li.active {
+  background-color: var(--primary-color);
+}
+table[data-form-control=datatable] ~ .dataTables_paginate .paginate_button.current {
+  background-color: var(--primary-color);
+}
 
 /* secondary color */
 
