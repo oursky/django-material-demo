@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, EmailField, ModelForm,
                           model_to_dict)
 from django.forms.widgets import RadioSelect
@@ -133,9 +133,10 @@ class QuestionFollowersFormSet(BaseInlineFormSet):
                 continue
             follower = form.cleaned_data.get('follower')
             if follower in followers:
-                raise ValidationError(
+                self.add_error(NON_FIELD_ERRORS, ValidationError(
                     'Please correct the duplicate values below.',
-                    'unique')
+                    'unique'))
+                break
             followers.append(follower)
 
 
@@ -286,10 +287,10 @@ class QuestionForm(SuperModelForm):
         for _, formset in self.formsets.items():
             error_count += formset.total_error_count()
         if error_count > 0:
-            raise ValidationError(
+            self.add_error(NON_FIELD_ERRORS, ValidationError(
                 'Please correct the error(s) below (%(len)s total).',
                 params={'len': error_count}
-            )
+            ))
 
 
 class QuestionCreateView(CreateModelView):
