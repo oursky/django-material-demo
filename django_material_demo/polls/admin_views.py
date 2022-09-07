@@ -333,6 +333,7 @@ class SettingsForm(forms.Form):
     primary_color_light = forms.CharField(label='Primary color light', required=False)
     primary_color_dark = forms.CharField(label='Primary color dark', required=False)
     secondary_color = forms.CharField(label='Secondary color', required=False)
+    secondary_color_light = forms.CharField(label='Secondary color light', required=False)
     success_color = forms.CharField(label='Success color', required=False)
     error_color = forms.CharField(label='Error color', required=False)
     link_color = forms.CharField(label='Link color', required=False)

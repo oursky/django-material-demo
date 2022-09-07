@@ -180,6 +180,9 @@ input[type=range]::-ms-thumb {
 .timepicker-close {
   color: var(--secondary-color);
 }
+.btn:hover, .btn-small:hover, .btn-large:hover {
+  background-color: var(--secondary-color-light);
+}
 
 /* success color */
 
