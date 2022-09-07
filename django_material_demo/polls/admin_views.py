@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.forms import EmailField, ModelForm, model_to_dict
+from django.core.exceptions import ValidationError
+from django.forms import (BaseInlineFormSet, EmailField, ModelForm,
+                          model_to_dict)
 from django.forms.widgets import RadioSelect
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
@@ -93,6 +95,7 @@ class UserUpdateModelView(UpdateModelView):
     def get_form_class(self):
         return UserForm
 
+
 class UserViewSet(ModelViewSet):
     model = User
     detail_view_class = UserDetailModelView
@@ -107,7 +110,7 @@ class AttachmentsForm(FormSetForm):
 
     class Meta:
         model = Attachment
-        fields = ['file', 'question']
+        fields = ['file']
 
 
 class QuestionFollowersForm(FormSetForm):
@@ -116,7 +119,24 @@ class QuestionFollowersForm(FormSetForm):
 
     class Meta:
         model = QuestionFollower
-        fields = ['follower', 'ordering', 'question']
+        fields = ['follower', 'ordering']
+
+
+class QuestionFollowersFormSet(BaseInlineFormSet):
+    # Formset validation
+    def clean(self):
+        super().clean()
+
+        followers = []
+        for form in self.forms:
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            follower = form.cleaned_data.get('follower')
+            if follower in followers:
+                raise ValidationError(
+                    'Please correct the duplicate values below.',
+                    'unique')
+            followers.append(follower)
 
 
 class ChoicesForm(FormSetForm):
@@ -125,7 +145,7 @@ class ChoicesForm(FormSetForm):
 
     class Meta:
         model = Choice
-        fields = ['choice_text', 'vote_count', 'question']
+        fields = ['choice_text', 'vote_count']
 
 
 class QuestionForm(SuperModelForm):
@@ -136,14 +156,16 @@ class QuestionForm(SuperModelForm):
 
     q_followers = InlineFormSetField(parent_model=Question,
                                      model=QuestionFollower,
-                                     form=QuestionFollowersForm, extra=0)
+                                     form=QuestionFollowersForm,
+                                     formset=QuestionFollowersFormSet, extra=0)
 
     choices = InlineFormSetField(parent_model=Question, model=Choice,
-                                 form=ChoicesForm, extra=0)
+                                 form=ChoicesForm, extra=0,
+                                 validate_min=True, min_num=2)
 
     layout = Layout(
         'question_text',
-        Row('total_vote_count', 'thumbnail'),
+        'thumbnail',
         Row('creator', 'show_creator'),
         'attachments',
         'q_followers',
@@ -152,7 +174,8 @@ class QuestionForm(SuperModelForm):
                  Row('vote_start', 'vote_end')),
         Fieldset('Vote restrictions',
                  'show_vote',
-                 Row('has_max_vote_count', 'max_vote_count'),
+                 'has_max_vote_count',
+                 Row('max_vote_count', 'total_vote_count'),
                  Row('min_selection', 'max_selection'),
                  'allow_custom'),
         'choices')
@@ -163,7 +186,7 @@ class QuestionForm(SuperModelForm):
                   'creator', 'show_creator', 'pub_date',
                   'vote_start', 'vote_end', 'show_vote', 'has_max_vote_count',
                   'max_vote_count', 'min_selection', 'max_selection',
-                  'allow_custom', ]
+                  'allow_custom']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -187,6 +210,86 @@ class QuestionForm(SuperModelForm):
             choices_queryset = self.instance.choice_set.all()
             self.initial["choices"] = choices_queryset
             self.formsets["choices"].queryset = choices_queryset
+
+    # Related field validations
+    def check_vote_end(self):
+        vote_end = self.cleaned_data['vote_end']
+        vote_start = self.cleaned_data['vote_start']
+
+        if (vote_start is not None
+                and vote_end is not None
+                and vote_start > vote_end):
+            self.add_error('vote_end', ValidationError(
+                'Ensure this time is later than the vote start date.',
+                'vote_end_too_early'))
+
+    def check_max_vote_count(self):
+        max_vote_count = self.cleaned_data['max_vote_count']
+        has_max_vote_count = self.cleaned_data['has_max_vote_count']
+
+        if max_vote_count is None and has_max_vote_count:
+            self.add_error('max_vote_count',
+                           ValidationError('This field is required.',
+                                           'max_vote_count_required'))
+
+        if max_vote_count is not None and max_vote_count < 0:
+            self.add_error('max_vote_count',
+                           ValidationError('Ensure this value is positive.',
+                                           'max_vote_count_positive'))
+
+    def check_selection_bounds(self):
+        min_selection = self.cleaned_data['min_selection']
+        max_selection = self.cleaned_data['max_selection']
+        choices = self.formsets['choices']
+
+        if (min_selection is not None
+                and max_selection is not None
+                and min_selection > max_selection):
+            self.add_error('max_selection', ValidationError(
+                'Ensure this value is greater than or equal to '
+                'the min selection.',
+                'max_selection_too_small'))
+
+        if (min_selection is not None
+                and min_selection > len(choices)):
+            self.add_error('min_selection', ValidationError(
+                'Ensure this value is less than or equal to '
+                'the number of choices (%(len)s).',
+                'max_selection_too_small',
+                params={'len': len(choices)}))
+
+    def check_total_vote_count(self):
+        total_vote_count = self.cleaned_data['total_vote_count']
+
+        has_max_vote_count = self.cleaned_data.get('has_max_vote_count', None)
+        if not has_max_vote_count:
+            return total_vote_count
+
+        max_vote_count = self.cleaned_data['max_vote_count']
+
+        if max_vote_count and total_vote_count > max_vote_count:
+            self.add_error('max_vote_count', ValidationError(
+                'Ensure total vote count is less than or equal to '
+                'the max vote count.',
+                'total_vote_count_too_big'))
+
+    def clean(self):
+        super().clean()
+
+        self.check_vote_end()
+        self.check_max_vote_count()
+        self.check_selection_bounds()
+        self.check_total_vote_count()
+
+        # Full form 'validation'
+        error_count = len(self.errors)
+        for _, formset in self.formsets.items():
+            error_count += formset.total_error_count()
+        if error_count > 0:
+            raise ValidationError(
+                'Please correct the error(s) below (%(len)s total).',
+                params={'len': error_count}
+            )
 
 
 class QuestionCreateView(CreateModelView):
