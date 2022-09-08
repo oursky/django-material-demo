@@ -4,6 +4,13 @@
   <div class="col s12">
     <h5>{{ formset.header|default:"" }}</h5>
     <dmc-formset>
+      {% if formset.non_form_errors %}
+        <div>
+          {% for error in formset.non_form_errors %}
+          <small class="error">{{ error }}</small>
+          {% endfor %}
+        </div>
+      {% endif %}
       <div class="formset-field col s12" data-formset-prefix="{{ formset.prefix }}" style="margin-bottom: 20px">
         {% if not disable_add_more %}
           <script type="form-template" data-formset-empty-form="{{ formset.prefix }}">
