@@ -45,7 +45,7 @@ class AccountForm(UserChangeForm):
         'user_permissions',
         'is_active',
         Row('is_staff', 'is_superuser'),
-        'date_joined',
+        Row('date_joined', 'last_login'),
     )
 
 
@@ -87,7 +87,7 @@ class UserDetailModelView(DetailModelView):
             'username', 'email',  # 'password',
             'first_name', 'last_name',
             'is_active', 'is_staff', 'is_superuser',
-            'date_joined',
+            'date_joined', 'last_login',
         ]
         for field in account_fields:
             attr = getattr(account, field, '')
