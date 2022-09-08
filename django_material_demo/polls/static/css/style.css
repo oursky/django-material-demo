@@ -1,0 +1,10 @@
+.input-field .button-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 -4px;
+}
+
+.input-field .button-group > * {
+  margin: 4px;
+}

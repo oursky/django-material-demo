@@ -41,7 +41,6 @@ if CSRF_TRUSTED_ORIGINS_STR:
 
 INSTALLED_APPS = [
     'polls.apps.PollsConfig',
-    'material.theme.lightgreen',
     'material',
     'material.frontend',
     'django.contrib.admin',

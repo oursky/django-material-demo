@@ -1,11 +1,38 @@
 {% extends 'material/frontend/base.html' %}
-{% load i18n %}
+{% load i18n static settings %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/colour-override.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        var r = document.querySelector(':root');
+        r.style.setProperty('--primary-color', "{% get_setting request 'primary_color' %}");
+        r.style.setProperty('--primary-color-light', "{% get_setting request 'primary_color_light' %}");
+        r.style.setProperty('--primary-color-dark', "{% get_setting request 'primary_color_dark' %}");
+        r.style.setProperty('--secondary-color', "{% get_setting request 'secondary_color' %}");
+        r.style.setProperty('--secondary-color-light', "{% get_setting request 'secondary_color_light' %}");
+        r.style.setProperty('--success-color', "{% get_setting request 'success_color' %}");
+        r.style.setProperty('--error-color', "{% get_setting request 'error_color' %}");
+        r.style.setProperty('--link-color', "{% get_setting request 'link_color' %}");
+    </script>
+{% endblock %}
 
 {% block title %}{% trans "Polls" %}{% endblock %}
 {% block page_title %}{% trans "Polls" %}{% endblock %}
 
 {% block sidenav_items %}
     {{ block.super }}
+    <li>
+        <a href="{% url 'polls:settings' %}" class="collapsible-header" data-turbolink="false">
+            Settings
+            <i class="material-icons">settings</i>
+        </a>
+    </li>
     <li>
         <a target="_blank" href="{% url 'polls:home' %}" class="collapsible-header">
             Open Homepage

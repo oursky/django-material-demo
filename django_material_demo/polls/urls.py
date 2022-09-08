@@ -16,4 +16,5 @@ urlpatterns = [
     path('admin/file/', include(admin_views.FileViewSet().urls)),
     path('admin/question/', include(admin_views.QuestionViewSet().urls)),
     path('admin/vote/', include(admin_views.VoteViewSet().urls)),
+    path('admin/settings', admin_views.SettingsView.as_view(), name='settings'),
 ]

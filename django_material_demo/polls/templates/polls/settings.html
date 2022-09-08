@@ -1,0 +1,141 @@
+{% extends 'material/frontend/base_site.html' %}
+{% load i18n material_form static %}
+
+{% block page_title %}Settings{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'js/theme-preset.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+{% block left-panel %}
+<div class="left-panel">
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-content">
+                {% form layout=form.layout %}{% endform %}
+                <div class="row">
+                    <div class="input-field col s12">
+                        <div class="button-group">
+                            <button
+                                type="button"
+                                class="btn grey darken-3"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#424242"
+                                data-theme-preset-primary-color-light="#686868"
+                                data-theme-preset-primary-color-dark="#1c1c1c"
+                                data-theme-preset-secondary-color="#37474f"
+                                data-theme-preset-secondary-color-light="#41555e"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Grey</button>
+                            <button
+                                type="button"
+                                class="btn amber darken-4"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#ff6f00"
+                                data-theme-preset-primary-color-light="#ff9a4d"
+                                data-theme-preset-primary-color-dark="#b34e00"
+                                data-theme-preset-secondary-color="#1976d2"
+                                data-theme-preset-secondary-color-light="#2083e4"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Amber</button>
+                            <button
+                                type="button"
+                                class="btn blue darken-2"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#1976d2"
+                                data-theme-preset-primary-color-light="#4e9cea"
+                                data-theme-preset-primary-color-dark="#11508e"
+                                data-theme-preset-secondary-color="#e64a19"
+                                data-theme-preset-secondary-color-light="#e95c30"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Blue</button>
+                            <button
+                                type="button"
+                                class="btn blue-grey darken-3"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#37474f"
+                                data-theme-preset-primary-color-light="#56707c"
+                                data-theme-preset-primary-color-dark="#181e22"
+                                data-theme-preset-secondary-color="#0d47a1"
+                                data-theme-preset-secondary-color-light="#0f51b9"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Blue grey</button>
+                            <button
+                                type="button"
+                                class="btn indigo darken-2"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#303f9f"
+                                data-theme-preset-primary-color-light="#5161ca"
+                                data-theme-preset-primary-color-dark="#1e2864"
+                                data-theme-preset-secondary-color="#00796b"
+                                data-theme-preset-secondary-color-light="#009382"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Indigo</button>
+                            <button
+                                type="button"
+                                class="btn light-green darken-3"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#558b2f"
+                                data-theme-preset-primary-color-light="#79c046"
+                                data-theme-preset-primary-color-dark="#32521c"
+                                data-theme-preset-secondary-color="#827717"
+                                data-theme-preset-secondary-color-light="#988b1b"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Light green</button>
+                            <button
+                                type="button"
+                                class="btn yellow darken-4"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#f57f17"
+                                data-theme-preset-primary-color-light="#f8a760"
+                                data-theme-preset-primary-color-dark="#b85a08"
+                                data-theme-preset-secondary-color="#424242"
+                                data-theme-preset-secondary-color-light="#4f4f4f"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Orange</button>
+                            <button
+                                type="button"
+                                class="btn yellow darken-3"
+                                data-theme-preset
+                                data-theme-preset-primary-color="#f9a825"
+                                data-theme-preset-primary-color-light="#fbc66f"
+                                data-theme-preset-primary-color-dark="#cc8006"
+                                data-theme-preset-secondary-color="#6a1b9a"
+                                data-theme-preset-secondary-color-light="#791fb0"
+                                data-theme-preset-success-color="#607d8b"
+                                data-theme-preset-error-color="#f44336"
+                                data-theme-preset-link-color="#039be5"
+                            >Yellow</button>
+                        </div>
+                        <label class="active">Presets</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-action">
+                <div class="right-align">
+                    <button type="submit" class="waves-effect waves-light btn white-text">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock left-panel %}
+{% block right-panel %}{% endblock right-panel %}
+{% endblock %}
