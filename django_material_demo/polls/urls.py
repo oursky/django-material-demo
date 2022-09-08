@@ -1,8 +1,7 @@
-from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
-from . import views, admin_views
+from . import admin_views, views
 
 app_name = 'polls'
 urlpatterns = [
@@ -13,6 +12,13 @@ urlpatterns = [
 
     path('admin/', RedirectView.as_view(url='user/', permanent=True), name='index'),
     path('admin/user/', include(admin_views.UserViewSet().urls)),
+    path("admin/user/<int:pk>/password/",
+         admin_views.PasswordChangeView.as_view(),
+         name="password_change"),
+    path("admin/user/<int:pk>/password/done/",
+         admin_views.PasswordChangeDoneView.as_view(),
+         name="password_change_done",),
+
     path('admin/file/', include(admin_views.FileViewSet().urls)),
     path('admin/question/', include(admin_views.QuestionViewSet().urls)),
     path('admin/vote/', include(admin_views.VoteViewSet().urls)),

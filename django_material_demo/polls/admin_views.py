@@ -1,21 +1,24 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, EmailField, ModelForm,
                           model_to_dict)
 from django.forms.widgets import RadioSelect
-from django.views.generic.edit import FormView
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
+from django.views import generic
+from django.views.generic.edit import FormView
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ModelViewSet, UpdateModelView)
 
 from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                        SuperModelForm)
-from .models import (Attachment, Choice, File, Question, QuestionFollower, Settings,
-                     User, Vote)
+from .models import (Attachment, Choice, File, Question, QuestionFollower,
+                     Settings, User, Vote)
 from .utils import FormSetForm, get_html_list
 
 
@@ -30,18 +33,20 @@ class FileViewSet(ModelViewSet):
         return False
 
 
-class AccountForm(ModelForm):
+class AccountForm(UserChangeForm):
     email = EmailField(required=True)
 
     layout = Layout(
         'username',
         'email',
+        'password',
+        Row('first_name', 'last_name'),
+        'groups',
+        'user_permissions',
+        'is_active',
+        Row('is_staff', 'is_superuser'),
+        'date_joined',
     )
-    parent_instance_field = 'user'
-
-    class Meta:
-        model = get_user_model()
-        fields = ['username', 'email']
 
 
 class UserForm(SuperModelForm):
@@ -74,8 +79,41 @@ class UserForm(SuperModelForm):
 class UserDetailModelView(DetailModelView):
     def get_object_data(self):
         user = super().get_object()
+
+        # Account fields
+        account = user.account
+
+        account_fields = [
+            'username', 'email',  # 'password',
+            'first_name', 'last_name',
+            'is_active', 'is_staff', 'is_superuser',
+            'date_joined',
+        ]
+        for field in account_fields:
+            attr = getattr(account, field, '')
+            if attr:
+                yield (field.replace('_', ' ').title(), attr)
+
+        auth_groups = account.groups.all()
+        html_list = get_html_list(auth_groups)
+        yield ('Auth Groups', html_list or None)
+
+        user_permissions = account.user_permissions.all()
+        html_list = get_html_list(user_permissions)
+        yield ('User Permissions', html_list or None)
+
+        # Polls fields
+        account_name = User._meta.get_field('account')
+        account_name = account_name.verbose_name.title()
+        group_name = User._meta.get_field('group')
+        group_name = group_name.verbose_name.title()
         for item in super().get_object_data():
-            yield item
+            if item[0] == account_name:
+                continue
+            elif item[0] == group_name:
+                yield ('Polls Group', item[1])
+            else:
+                yield item
 
         # M2M field
         followed_users = user.followed_users.order_by('account__username')
@@ -328,12 +366,25 @@ class VoteViewSet(ModelViewSet):
         return False
 
 
+class PasswordChangeView(generic.View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('Form for changing password')
+
+
+class PasswordChangeDoneView(generic.View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('Password changed!')
+
+
 class SettingsForm(forms.Form):
     primary_color = forms.CharField(label='Primary color', required=False)
-    primary_color_light = forms.CharField(label='Primary color light', required=False)
-    primary_color_dark = forms.CharField(label='Primary color dark', required=False)
+    primary_color_light = forms.CharField(
+        label='Primary color light', required=False)
+    primary_color_dark = forms.CharField(
+        label='Primary color dark', required=False)
     secondary_color = forms.CharField(label='Secondary color', required=False)
-    secondary_color_light = forms.CharField(label='Secondary color light', required=False)
+    secondary_color_light = forms.CharField(
+        label='Secondary color light', required=False)
     success_color = forms.CharField(label='Success color', required=False)
     error_color = forms.CharField(label='Error color', required=False)
     link_color = forms.CharField(label='Link color', required=False)
