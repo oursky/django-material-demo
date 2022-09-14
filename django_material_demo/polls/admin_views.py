@@ -19,7 +19,7 @@ from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                        SuperModelForm)
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      Settings, User, Vote)
-from .utils import FormSetForm, get_html_list
+from .utils import FormSetForm, NestedModelFormField, get_html_list
 
 
 class FileViewSet(ModelViewSet):
@@ -192,7 +192,18 @@ class ChoicesForm(FormSetForm):
         fields = ['choice_text', 'vote_count']
 
 
+class MaxVoteCountForm(ModelForm):
+    layout = Layout(Row('has_max_vote_count', 'max_vote_count'))
+    template_name = 'material/forms/max_vote_count_form.html'
+
+    class Meta:
+        model = Question
+        fields = ['has_max_vote_count', 'max_vote_count']
+
+
 class QuestionForm(SuperModelForm):
+    max_vote_count_control = NestedModelFormField(MaxVoteCountForm)
+
     # Formset fields
     attachments = InlineFormSetField(parent_model=Question,
                                      model=Attachment,
@@ -209,7 +220,7 @@ class QuestionForm(SuperModelForm):
 
     layout = Layout(
         'question_text',
-        'thumbnail',
+        Row('total_vote_count', 'thumbnail'),
         Row('creator', 'show_creator'),
         'attachments',
         'q_followers',
@@ -218,8 +229,7 @@ class QuestionForm(SuperModelForm):
                  Row('vote_start', 'vote_end')),
         Fieldset('Vote restrictions',
                  'show_vote',
-                 'has_max_vote_count',
-                 Row('max_vote_count', 'total_vote_count'),
+                 'max_vote_count_control',
                  Row('min_selection', 'max_selection'),
                  'allow_custom'),
         'choices')
@@ -240,8 +250,6 @@ class QuestionForm(SuperModelForm):
         self.formsets["choices"].header = 'Choices'
 
         if self.instance and self.instance.id:
-            self.initial = model_to_dict(self.instance)
-
             attachments_queryset = self.instance.attachment_set.all()
             self.initial["attachments"] = attachments_queryset
             self.formsets["attachments"].queryset = attachments_queryset
@@ -342,6 +350,15 @@ class QuestionCreateView(CreateModelView):
 
 
 class QuestionUpdateView(UpdateModelView):
+    def get(self, request, *args, **kwargs):
+        if request.GET:
+            form_class = self.get_form_class()
+            form = form_class(request.GET)
+
+            self.object = self.get_object()
+            return self.render_to_response(self.get_context_data(form=form))
+        return super().get(request, *args, **kwargs)
+
     def get_form_class(self):
         return QuestionForm
 

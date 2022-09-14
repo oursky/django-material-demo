@@ -2,6 +2,8 @@ from django.forms import ModelForm
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
+from .library.django_superform import ModelFormField
+
 
 def get_html_list(arr):
     """Generate a HTML unordered list from an iterable
@@ -37,3 +39,10 @@ class FormSetForm(ModelForm):
         # NOTE: Ignore parent instance foreign key error as we save ourselves
         if self._errors.get(self.parent_instance_field):
             self._errors.pop(self.parent_instance_field)
+
+
+class NestedModelFormField(ModelFormField):
+    def get_instance(self, form, name):
+        if form._meta.model != self.form_class._meta.model:
+            raise ValueError('Field model must be same as the form model')
+        return form.instance
