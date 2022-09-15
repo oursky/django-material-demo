@@ -200,6 +200,9 @@ class MaxVoteCountForm(ModelForm):
         model = Question
         fields = ['has_max_vote_count', 'max_vote_count']
 
+    class Media:
+        js = ['js/reload_form.js']
+
 
 class QuestionForm(SuperModelForm):
     max_vote_count_control = NestedModelFormField(MaxVoteCountForm)
@@ -352,11 +355,13 @@ class QuestionCreateView(CreateModelView):
 class QuestionUpdateView(UpdateModelView):
     def get(self, request, *args, **kwargs):
         if request.GET:
+            # form data included in GET request, use it to initialize form
             form_class = self.get_form_class()
             form = form_class(request.GET)
 
             self.object = self.get_object()
             return self.render_to_response(self.get_context_data(form=form))
+        # no form data, fallback to default
         return super().get(request, *args, **kwargs)
 
     def get_form_class(self):
