@@ -194,7 +194,27 @@ class ChoicesForm(FormSetForm):
 
 class MaxVoteCountForm(ModelForm):
     layout = Layout(Row('has_max_vote_count', 'max_vote_count'))
-    template_name = 'material/forms/max_vote_count_form.html'
+    template_name = 'polls/forms/max_vote_count_form.html'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        has_max_vote_count = self.fields['has_max_vote_count']
+        max_vote_count = self.fields['max_vote_count']
+        if self.data:
+            # get value from boundfield
+            toggle = self['has_max_vote_count'].value()
+        else:
+            # use initial value
+            toggle = self.initial.get('has_max_vote_count')
+
+        # reload form when field value is changed
+        has_max_vote_count.widget.attrs.update({'data-reload-form': True})
+        # make max_vote_count editable depending on has_max_vote_count value
+        if toggle:
+            max_vote_count.widget.attrs.update(required=True)
+        else:
+            max_vote_count.widget.attrs.update(disabled=True, value='')
 
     class Meta:
         model = Question

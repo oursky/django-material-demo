@@ -1,6 +1,7 @@
 "use strict";
 {
   function reloadForm(e) {
+    // exclude csrfmiddlewaretoken since it is regenerated when form reloads
     let formSelector = "form :not(input[name=csrfmiddlewaretoken])";
     let formData = $(formSelector).serialize();
     let inputId = e.target.id;
@@ -15,6 +16,7 @@
   }
 
   $(document).ready(function () {
-    $(document).on("change", "input[data-reload-form]", reloadForm);
+    // allow only one execution since handler is reattached on each form reload
+    $(document).one("change", "input[data-reload-form]", reloadForm);
   });
 }
