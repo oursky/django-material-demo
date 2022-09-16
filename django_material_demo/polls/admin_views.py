@@ -3,9 +3,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms import (BaseInlineFormSet, EmailField, ModelForm,
-                          model_to_dict)
-from django.forms.widgets import RadioSelect
+from django.forms import (BaseInlineFormSet, BooleanField, EmailField,
+                          ModelForm, model_to_dict)
+from django.forms.widgets import CheckboxInput, RadioSelect
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -19,8 +19,8 @@ from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                        SuperModelForm)
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      Settings, User, Vote)
-from .utils import (FormSetForm, GetParamAsFormDataMixin, NestedModelFormField,
-                    get_html_list)
+from .utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
+                    NestedModelFormField, get_html_list)
 
 
 class FileViewSet(ModelViewSet):
@@ -193,7 +193,12 @@ class ChoicesForm(FormSetForm):
         fields = ['choice_text', 'vote_count']
 
 
-class MaxVoteCountForm(ModelForm):
+class MaxVoteCountForm(ModelForm, FieldDataMixin):
+    # If want to add attrs declaratively
+    # has_max_vote_count = BooleanField(
+    #     required=False,
+    #     widget=CheckboxInput(attrs={'data-reload-form': True}))
+
     layout = Layout(Row('has_max_vote_count', 'max_vote_count'))
     template_name = 'polls/forms/max_vote_count_form.html'
 
@@ -202,14 +207,9 @@ class MaxVoteCountForm(ModelForm):
 
         has_max_vote_count = self.fields['has_max_vote_count']
         max_vote_count = self.fields['max_vote_count']
-        if self.data:
-            # get value from boundfield
-            toggle = self['has_max_vote_count'].value()
-        else:
-            # use initial value
-            toggle = self.initial.get('has_max_vote_count')
+        toggle = self.get_field_value('has_max_vote_count')
 
-        # reload form when field value is changed
+        # reload form when field value is changed (add attrs imperatively)
         has_max_vote_count.widget.attrs.update({'data-reload-form': True})
         # make max_vote_count editable depending on has_max_vote_count value
         if toggle:

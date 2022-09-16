@@ -52,7 +52,7 @@ class NestedModelFormField(ModelFormField):
 
 
 class GetParamAsFormDataMixin(SingleObjectTemplateResponseMixin,
-                            ModelFormMixin, ProcessFormView):
+                              ModelFormMixin, ProcessFormView):
     # mixin to be used with CreateView or UpdateView
     def get(self, request, *args, **kwargs):
         if request.GET:
@@ -68,3 +68,13 @@ class GetParamAsFormDataMixin(SingleObjectTemplateResponseMixin,
             return self.render_to_response(self.get_context_data(form=form))
         # no form data, fallback to default
         return super().get(request, *args, **kwargs)
+
+
+class FieldDataMixin(object):
+    def get_field_value(self, field_name):
+        if self.is_bound:
+            # get value from boundfield
+            return self[field_name].value()
+        else:
+            # use initial value
+            return self.initial.get(field_name)
