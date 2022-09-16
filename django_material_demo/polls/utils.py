@@ -1,6 +1,9 @@
 from django.forms import ModelForm
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+from django.views.generic.detail import SingleObjectTemplateResponseMixin
+from django.views.generic.edit import (ModelFormMixin, ProcessFormView,
+                                       UpdateView)
 
 from .library.django_superform import ModelFormField
 
@@ -46,3 +49,22 @@ class NestedModelFormField(ModelFormField):
         if form._meta.model != self.form_class._meta.model:
             raise ValueError('Field model must be same as the form model')
         return form.instance
+
+
+class GetParamAsFormDataMixin(SingleObjectTemplateResponseMixin,
+                            ModelFormMixin, ProcessFormView):
+    # mixin to be used with CreateView or UpdateView
+    def get(self, request, *args, **kwargs):
+        if request.GET:
+            # form data included in GET request, use it to initialize form
+            form_class = self.get_form_class()
+            form = form_class(request.GET)
+
+            if isinstance(self, UpdateView):
+                self.object = self.get_object()
+            else:
+                # self is CreateView, no associated object
+                self.object = None
+            return self.render_to_response(self.get_context_data(form=form))
+        # no form data, fallback to default
+        return super().get(request, *args, **kwargs)

@@ -19,7 +19,8 @@ from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                        SuperModelForm)
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      Settings, User, Vote)
-from .utils import FormSetForm, NestedModelFormField, get_html_list
+from .utils import (FormSetForm, GetParamAsFormDataMixin, NestedModelFormField,
+                    get_html_list)
 
 
 class FileViewSet(ModelViewSet):
@@ -367,23 +368,12 @@ class QuestionForm(SuperModelForm):
             ))
 
 
-class QuestionCreateView(CreateModelView):
+class QuestionCreateView(CreateModelView, GetParamAsFormDataMixin):
     def get_form_class(self):
         return QuestionForm
 
 
-class QuestionUpdateView(UpdateModelView):
-    def get(self, request, *args, **kwargs):
-        if request.GET:
-            # form data included in GET request, use it to initialize form
-            form_class = self.get_form_class()
-            form = form_class(request.GET)
-
-            self.object = self.get_object()
-            return self.render_to_response(self.get_context_data(form=form))
-        # no form data, fallback to default
-        return super().get(request, *args, **kwargs)
-
+class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
     def get_form_class(self):
         return QuestionForm
 
