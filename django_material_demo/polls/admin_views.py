@@ -3,9 +3,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms import (BaseInlineFormSet, EmailField, ModelForm,
-                          model_to_dict)
-from django.forms.widgets import RadioSelect
+from django.forms import (BaseInlineFormSet, BooleanField, EmailField,
+                          ModelForm, model_to_dict)
+from django.forms.widgets import CheckboxInput, RadioSelect
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -19,7 +19,8 @@ from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                        SuperModelForm)
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      Settings, User, Vote)
-from .utils import FormSetForm, get_html_list
+from .utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
+                    NestedModelFormField, get_html_list)
 
 
 class FileViewSet(ModelViewSet):
@@ -192,7 +193,41 @@ class ChoicesForm(FormSetForm):
         fields = ['choice_text', 'vote_count']
 
 
+class MaxVoteCountForm(ModelForm, FieldDataMixin):
+    # If want to add attrs declaratively
+    # has_max_vote_count = BooleanField(
+    #     required=False,
+    #     widget=CheckboxInput(attrs={'data-reload-form': True}))
+
+    layout = Layout(Row('has_max_vote_count', 'max_vote_count'))
+    template_name = 'polls/forms/max_vote_count_form.html'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        has_max_vote_count = self.fields['has_max_vote_count']
+        max_vote_count = self.fields['max_vote_count']
+        toggle = self.get_field_value('has_max_vote_count')
+
+        # reload form when field value is changed (add attrs imperatively)
+        has_max_vote_count.widget.attrs.update({'data-reload-form': True})
+        # make max_vote_count editable depending on has_max_vote_count value
+        if toggle:
+            max_vote_count.widget.attrs.update(required=True)
+        else:
+            max_vote_count.widget.attrs.update(disabled=True, value='')
+
+    class Meta:
+        model = Question
+        fields = ['has_max_vote_count', 'max_vote_count']
+
+    class Media:
+        js = ['js/reload_form.js']
+
+
 class QuestionForm(SuperModelForm):
+    max_vote_count_control = NestedModelFormField(MaxVoteCountForm)
+
     # Formset fields
     attachments = InlineFormSetField(parent_model=Question,
                                      model=Attachment,
@@ -209,7 +244,7 @@ class QuestionForm(SuperModelForm):
 
     layout = Layout(
         'question_text',
-        'thumbnail',
+        Row('total_vote_count', 'thumbnail'),
         Row('creator', 'show_creator'),
         'attachments',
         'q_followers',
@@ -218,8 +253,7 @@ class QuestionForm(SuperModelForm):
                  Row('vote_start', 'vote_end')),
         Fieldset('Vote restrictions',
                  'show_vote',
-                 'has_max_vote_count',
-                 Row('max_vote_count', 'total_vote_count'),
+                 'max_vote_count_control',
                  Row('min_selection', 'max_selection'),
                  'allow_custom'),
         'choices')
@@ -240,8 +274,6 @@ class QuestionForm(SuperModelForm):
         self.formsets["choices"].header = 'Choices'
 
         if self.instance and self.instance.id:
-            self.initial = model_to_dict(self.instance)
-
             attachments_queryset = self.instance.attachment_set.all()
             self.initial["attachments"] = attachments_queryset
             self.formsets["attachments"].queryset = attachments_queryset
@@ -336,12 +368,12 @@ class QuestionForm(SuperModelForm):
             ))
 
 
-class QuestionCreateView(CreateModelView):
+class QuestionCreateView(CreateModelView, GetParamAsFormDataMixin):
     def get_form_class(self):
         return QuestionForm
 
 
-class QuestionUpdateView(UpdateModelView):
+class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
     def get_form_class(self):
         return QuestionForm
 
