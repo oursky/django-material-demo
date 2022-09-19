@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.db.models import Count
 from django.forms import (BaseInlineFormSet, BooleanField, EmailField,
                           ModelForm, model_to_dict)
 from django.forms.widgets import CheckboxInput, RadioSelect
@@ -11,16 +11,19 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.generic.edit import FormView
+from django_filters import CharFilter, FilterSet, NumberFilter
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
-                                     ModelViewSet, UpdateModelView)
+                                     ListModelView, ModelViewSet,
+                                     UpdateModelView)
 
 from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                        SuperModelForm)
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      Settings, User, Vote)
 from .utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
-                    NestedModelFormField, get_html_list)
+                    ListFilterView, NestedModelFormField, SearchFilterMixin,
+                    get_html_list)
 
 
 class FileViewSet(ModelViewSet):
@@ -77,7 +80,7 @@ class UserForm(SuperModelForm):
             self.initial["account"] = account_queryset
 
 
-class UserDetailModelView(DetailModelView):
+class UserDetailView(DetailModelView):
     def get_object_data(self):
         user = super().get_object()
 
@@ -135,17 +138,49 @@ class UserDetailModelView(DetailModelView):
         yield ('Question Notify Times', html_list or 'None')
 
 
-class UserUpdateModelView(UpdateModelView):
+class UserUpdateView(UpdateModelView):
     def get_form_class(self):
         return UserForm
 
 
+class UserFilterForm(forms.Form):
+    layout = Layout('search',
+                    'group',
+                    'account__username',
+                    'min_follower_count')
+
+
+class UserFilter(SearchFilterMixin, FilterSet):
+    search_fields = ['account__username', 'group']
+    search = CharFilter(method='keyword_search', label='Search')
+
+    account__username = CharFilter(lookup_expr='icontains',
+                                   label='Name contains')
+
+    min_follower_count = NumberFilter(field_name='user_followed',
+                                      method='filter_count_gte',
+                                      label='Minimum follower count')
+
+    def filter_count_gte(self, queryset, name, value):
+        qs = queryset.annotate(name_count=Count(name))
+        return qs.filter(name_count__gte=value)
+
+    class Meta:
+        model = User
+        fields = {'group': ['exact']}
+        form = UserFilterForm
+
+
+class UserListView(ListModelView, ListFilterView):
+    list_display = ['name', 'group', 'followers_list']
+    filterset_class = UserFilter
+
+
 class UserViewSet(ModelViewSet):
     model = User
-    detail_view_class = UserDetailModelView
-    update_view_class = UserUpdateModelView
-
-    list_display = ['account', 'group', 'followers_list']
+    detail_view_class = UserDetailView
+    update_view_class = UserUpdateView
+    list_view_class = UserListView
 
 
 class AttachmentsForm(FormSetForm):
@@ -378,13 +413,36 @@ class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
         return QuestionForm
 
 
+class QuestionFilterForm(forms.Form):
+    layout = Layout('search',
+                    'question_text',
+                    'show_vote')
+
+
+class QuestionFilter(SearchFilterMixin, FilterSet):
+    search_fields = ['question_text', 'creator__account__username',
+                     'choice__choice_text']
+    search = CharFilter(method='keyword_search', label='Search')
+
+    question_text = CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        model = Question
+        fields = {'show_vote': ['exact']}
+        form = QuestionFilterForm
+
+
+class QuestionListView(ListModelView, ListFilterView):
+    list_display = ['question_text', 'creator', 'choice_list',
+                    'vote_start', 'vote_end', 'selection_bounds']
+    filterset_class = QuestionFilter
+
+
 class QuestionViewSet(ModelViewSet):
     model = Question
     create_view_class = QuestionCreateView
     update_view_class = QuestionUpdateView
-
-    list_display = ['question_text', 'creator', 'vote_start',
-                    'vote_end', 'selection_bounds']
+    list_view_class = QuestionListView
 
 
 class VoteViewSet(ModelViewSet):

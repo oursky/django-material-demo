@@ -115,6 +115,11 @@ class Question(models.Model):
                 'min': self.min_selection or 1,
                 'max': self.max_selection or 'unbounded'}
 
+    def choice_list(self):
+        choices = Choice.objects.filter(question=self)
+        choices = choices.order_by('choice_text')
+        return [choice.choice_text for choice in choices]
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
