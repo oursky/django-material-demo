@@ -11,7 +11,7 @@ from django.views.generic.edit import (ModelFormMixin, ProcessFormView,
 from django_filters import CharFilter, FilterSet
 from django_filters.views import FilterView
 
-from .library.django_superform import ModelFormField
+from library.django_superform import ModelFormField
 
 
 def get_html_list(arr):

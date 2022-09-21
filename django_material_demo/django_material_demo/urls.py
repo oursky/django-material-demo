@@ -13,10 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from cms.polls import views as cms_views
 from django.contrib import admin
+from django.contrib.auth.views import LoginView
 from django.urls import include, path
 from material.frontend import urls as frontend_urls
-from django.contrib.auth.views import LoginView
 from polls.forms import EmailLoginForm
 
 urlpatterns = [
@@ -27,4 +28,6 @@ urlpatterns = [
         name="login"
     ),
     path('', include(frontend_urls)),
+    path('polls/', include('polls.urls')),
+    path('cms/setting/', cms_views.SettingsView.as_view(), name='settings'),
 ]

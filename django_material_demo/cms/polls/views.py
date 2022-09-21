@@ -12,15 +12,17 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.generic.edit import FormView
 from django_filters import CharFilter, NumberFilter
+from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
+                                      SuperModelForm)
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
                                      UpdateModelView)
 
-from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
-                                       SuperModelForm)
-from .models import (Attachment, Choice, File, Question, QuestionFollower,
-                     Settings, User, Vote)
+from polls.models import (Attachment, Choice, File, Question, QuestionFollower,
+                          User, Vote)
+
+from .models import Settings
 from .utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
                     ListFilterView, NestedModelFormField, SearchAndFilterSet,
                     get_html_list)
@@ -234,7 +236,7 @@ class MaxVoteCountForm(ModelForm, FieldDataMixin):
     #     widget=CheckboxInput(attrs={'data-reload-form': True}))
 
     layout = Layout(Row('has_max_vote_count', 'max_vote_count'))
-    template_name = 'polls/forms/max_vote_count_form.html'
+    template_name = 'cms_polls/forms/max_vote_count_form.html'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -481,7 +483,7 @@ class SettingsForm(forms.Form):
 @method_decorator(staff_member_required(login_url='login'), name='dispatch')
 class SettingsView(FormView):
     form_class = SettingsForm
-    template_name = 'polls/settings.html'
+    template_name = 'cms/settings.html'
 
     def get_initial(self):
         return model_to_dict(Settings(session=self.request.session))
@@ -492,4 +494,4 @@ class SettingsView(FormView):
             setattr(settings, k, v)
 
         settings.save()
-        return redirect('polls:settings')
+        return redirect('settings')
