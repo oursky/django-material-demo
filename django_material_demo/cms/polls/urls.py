@@ -1,20 +1,19 @@
+from .views import file, question, user, vote
 from django.urls import include, path
 from django.views.generic.base import RedirectView
-
-from cms.polls import views
 
 app_name = 'cms_polls'
 urlpatterns = [
     path('', RedirectView.as_view(url='user/', permanent=True), name='index'),
-    path('user/', include(views.UserViewSet().urls)),
+    path('user/', include(user.UserViewSet().urls)),
     path("user/<int:pk>/password/",
-        views.PasswordChangeView.as_view(),
+        user.PasswordChangeView.as_view(),
         name="password_change"),
     path("user/<int:pk>/password/done/",
-        views.PasswordChangeDoneView.as_view(),
+        user.PasswordChangeDoneView.as_view(),
         name="password_change_done",),
 
-    path('file/', include(views.FileViewSet().urls)),
-    path('question/', include(views.QuestionViewSet().urls)),
-    path('vote/', include(views.VoteViewSet().urls)),
+    path('file/', include(file.FileViewSet().urls)),
+    path('question/', include(question.QuestionViewSet().urls)),
+    path('vote/', include(vote.VoteViewSet().urls)),
 ]
