@@ -3,7 +3,7 @@ from django.views.generic.base import RedirectView
 
 from cms.polls import views
 
-app_name = 'polls_admin'
+app_name = 'cms_polls'
 urlpatterns = [
     path('', RedirectView.as_view(url='user/', permanent=True), name='index'),
     path('user/', include(views.UserViewSet().urls)),
@@ -17,5 +17,4 @@ urlpatterns = [
     path('file/', include(views.FileViewSet().urls)),
     path('question/', include(views.QuestionViewSet().urls)),
     path('vote/', include(views.VoteViewSet().urls)),
-    path('settings', views.SettingsView.as_view(), name='settings'),
 ]

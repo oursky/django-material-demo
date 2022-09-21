@@ -1,11 +1,11 @@
 {% comment %} https://materializecss.com/sidenav.html {% endcomment %}
 <ul>
-    <li><a href="{% url 'cms_polls:user_list' %}">User List</a></li>
-    <li><a href="{% url 'cms_polls:file_list' %}">File List</a></li>
-    <li><a href="{% url 'cms_polls:question_list' %}">Question List</a></li>
-    <li><a href="{% url 'cms_polls:vote_list' %}">Vote List</a></li>
+    <li><a href="{% url 'polls:user_list' %}">User List</a></li>
+    <li><a href="{% url 'polls:file_list' %}">File List</a></li>
+    <li><a href="{% url 'polls:question_list' %}">Question List</a></li>
+    <li><a href="{% url 'polls:vote_list' %}">Vote List</a></li>
     <li>
-        <a target="_blank" href="{% url 'polls:home' %}"
+        <a target="_blank" href="{% url 'app_polls:home' %}"
         class="collapsible-header" >
             Open Homepage
             <i class="material-icons">open_in_new</i>

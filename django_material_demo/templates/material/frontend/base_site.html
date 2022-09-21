@@ -21,16 +21,3 @@
         r.style.setProperty('--link-color', "{% get_setting request 'link_color' %}");
     </script>
 {% endblock %}
-
-{% block title %}{% trans "Polls" %}{% endblock %}
-{% block page_title %}{% trans "Polls" %}{% endblock %}
-
-{% block sidenav_items %}
-    {{ block.super }}
-    <li>
-        <a href="{% url 'settings' %}" class="collapsible-header" data-turbolink="false">
-            Settings
-            <i class="material-icons">settings</i>
-        </a>
-    </li>
-{% endblock %}

@@ -27,7 +27,6 @@ urlpatterns = [
         authentication_form=EmailLoginForm),
         name="login"
     ),
-    path('', include(frontend_urls)),
-    path('polls/', include('polls.urls')),
-    path('cms/setting/', cms_views.SettingsView.as_view(), name='settings'),
+    path('polls/', include('polls.urls', namespace='app_polls')),
+    path('cms/', include('cms.urls')),
 ]

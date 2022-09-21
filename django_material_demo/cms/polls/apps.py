@@ -1,15 +1,13 @@
 from django.apps import AppConfig
-from material.frontend.apps import ModuleMixin
-from material.frontend.urlconf import ModuleURLResolver
+
+from ..utils import ModuleNamespaceMixin
 
 
-class CmsPollsConfig(ModuleMixin, AppConfig):
+class CmsPollsConfig(ModuleNamespaceMixin, AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'cms.polls'
-    label = 'polls'
-    verbose_name = 'CMS Polls'
-    base_url = 'cms/polls/'
+    label = 'cms_polls'
+    verbose_name = 'Polls'
 
-    @property
-    def urls(self):
-        return ModuleURLResolver(self.base_url, self.get_urls(), module=self, app_name=self.label, namespace=self.label)
+    base_url = 'polls/'
+    namespace = 'polls'

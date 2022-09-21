@@ -41,6 +41,7 @@ if CSRF_TRUSTED_ORIGINS_STR:
 
 INSTALLED_APPS = [
     'cms.polls.apps.CmsPollsConfig',
+    'cms.settings.apps.CmsSettingsConfig',
     'polls.apps.PollsConfig',
     'material',
     'material.frontend',
