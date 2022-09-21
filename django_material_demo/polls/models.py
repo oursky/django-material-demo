@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from django.conf import settings
 from django.contrib import admin
 from django.db import models
@@ -11,6 +10,9 @@ class File(models.Model):
     file_name = models.CharField(max_length=100)
     file_type = models.TextField()
     file_size = models.IntegerField()
+
+    class Meta:
+        ordering = ['file_name', 'id']
 
     def __str__(self):
         return self.file_name
@@ -38,6 +40,9 @@ class User(models.Model):
         through='UserFollower',
         through_fields=('follower', 'followed_user'))
 
+    class Meta:
+        ordering = ['account__username', 'id']
+
     def __str__(self):
         return self.account.username
 
@@ -63,6 +68,9 @@ class UserFollower(models.Model):
     ordering = models.FloatField(default=0)
     enable_email_notify = models.BooleanField(default=False)
     notify_time = models.TimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-ordering', 'id']
 
     def __str__(self):
         return str(self.follower) + ' → ' + str(self.followed_user)
@@ -103,8 +111,14 @@ class Question(models.Model):
     max_vote_count = models.IntegerField(null=True, blank=True)
     allow_custom = models.BooleanField('allow custom votes', default=False)
 
+    class Meta:
+        ordering = ['question_text', 'id']
+
     def __str__(self):
         return self.question_text
+
+    class Meta:
+        ordering = ['question_text']
 
     @admin.display()
     def selection_bounds(self):
@@ -115,11 +129,19 @@ class Question(models.Model):
                 'min': self.min_selection or 1,
                 'max': self.max_selection or 'unbounded'}
 
+    def choice_list(self):
+        choices = Choice.objects.filter(question=self)
+        choices = choices.order_by('choice_text')
+        return [choice.choice_text for choice in choices]
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
     vote_count = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['choice_text', 'id']
 
     def __str__(self):
         return self.choice_text
@@ -133,6 +155,9 @@ class Vote(models.Model):
         Choice, on_delete=models.CASCADE, null=True, blank=True)
     custom_choice_text = models.CharField(
         max_length=200, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-timestamp', 'id']
 
     def __str__(self):
         return '#%(id)s (%(question)s)' % {
@@ -150,6 +175,9 @@ class Attachment(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     file = models.OneToOneField(File, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['file', 'id']
+
     def __str__(self):
         return str(self.file)
 
@@ -160,6 +188,9 @@ class QuestionFollower(models.Model):
     ordering = models.FloatField(default=0)
     enable_email_notify = models.BooleanField(default=False)
     notify_time = models.TimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-ordering', 'question', 'id']
 
     def __str__(self):
         return str(self.follower) + ' → ' + str(self.question)
@@ -184,14 +215,22 @@ class Settings(models.Model):
         self.load()
 
     def load(self):
-        self.primary_color = self.session.get('settings:--primary-color') or '#424242'
-        self.primary_color_light = self.session.get('settings:--primary-color-light') or '#686868'
-        self.primary_color_dark = self.session.get('settings:--primary-color-dark') or '#1c1c1c'
-        self.secondary_color = self.session.get('settings:--secondary-color') or '#37474f'
-        self.secondary_color_light = self.session.get('settings:--secondary-color-light') or '#56707c'
-        self.success_color = self.session.get('settings:--sucess-color') or '#607d8b'
-        self.error_color = self.session.get('settings:--error-color') or '#f44336'
-        self.link_color = self.session.get('settings:--link-color') or '#039be5'
+        self.primary_color = self.session.get(
+            'settings:--primary-color') or '#424242'
+        self.primary_color_light = self.session.get(
+            'settings:--primary-color-light') or '#686868'
+        self.primary_color_dark = self.session.get(
+            'settings:--primary-color-dark') or '#1c1c1c'
+        self.secondary_color = self.session.get(
+            'settings:--secondary-color') or '#37474f'
+        self.secondary_color_light = self.session.get(
+            'settings:--secondary-color-light') or '#56707c'
+        self.success_color = self.session.get(
+            'settings:--sucess-color') or '#607d8b'
+        self.error_color = self.session.get(
+            'settings:--error-color') or '#f44336'
+        self.link_color = self.session.get(
+            'settings:--link-color') or '#039be5'
 
     def save(self):
         self.session['settings:--primary-color'] = self.primary_color

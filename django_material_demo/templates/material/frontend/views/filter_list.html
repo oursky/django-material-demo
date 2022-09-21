@@ -1,0 +1,19 @@
+{% extends 'material/frontend/views/list.html' %}
+{% load i18n material_form material_frontend %}
+
+{% block right-panel %}
+<div class="right-panel">
+    <div class="card">
+    <dmc-form>
+    <form method="GET">
+        <div class="card-content">
+            {% form form=filter.form %}{% endform %}
+        </div>
+        <div class="card-action">
+            <button type="submit" class="waves-effect waves-light btn white-text">Apply</button>
+        </div>
+    </form>
+    </dmc-form>
+    </div>
+</div>
+{% endblock right-panel %}
