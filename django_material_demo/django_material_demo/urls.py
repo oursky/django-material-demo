@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from cms.polls import views as cms_views
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.urls import include, path
@@ -28,5 +27,5 @@ urlpatterns = [
         name="login"
     ),
     path('polls/', include('polls.urls', namespace='app_polls')),
-    path('cms/', include('cms.urls')),
+    path('cms/', include(frontend_urls)),
 ]
