@@ -8,6 +8,7 @@ from django.utils.safestring import mark_safe
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.edit import (ModelFormMixin, ProcessFormView,
                                        UpdateView)
+from django_filters import CharFilter, FilterSet
 from django_filters.views import FilterView
 
 from .library.django_superform import ModelFormField
@@ -106,9 +107,10 @@ class ListFilterView(FilterView):
         return context
 
 
-class SearchFilterMixin:
+class SearchAndFilterSet(FilterSet):
     # fields to search values from
     search_fields = []
+    search = CharFilter(method='keyword_search', label='Search')
 
     def keyword_search(self, queryset, name, value):
         # search if any keyword is in any provided search fields

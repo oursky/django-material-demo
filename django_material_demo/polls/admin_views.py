@@ -11,7 +11,7 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.generic.edit import FormView
-from django_filters import CharFilter, FilterSet, NumberFilter
+from django_filters import CharFilter, NumberFilter
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
@@ -22,7 +22,7 @@ from .library.django_superform import (ForeignKeyFormField, InlineFormSetField,
 from .models import (Attachment, Choice, File, Question, QuestionFollower,
                      Settings, User, Vote)
 from .utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
-                    ListFilterView, NestedModelFormField, SearchFilterMixin,
+                    ListFilterView, NestedModelFormField, SearchAndFilterSet,
                     get_html_list)
 
 
@@ -150,9 +150,8 @@ class UserFilterForm(forms.Form):
                     'min_follower_count')
 
 
-class UserFilter(SearchFilterMixin, FilterSet):
+class UserFilter(SearchAndFilterSet):
     search_fields = ['account__username', 'group']
-    search = CharFilter(method='keyword_search', label='Search')
 
     account__username = CharFilter(lookup_expr='icontains',
                                    label='Name contains')
@@ -419,10 +418,9 @@ class QuestionFilterForm(forms.Form):
                     'show_vote')
 
 
-class QuestionFilter(SearchFilterMixin, FilterSet):
+class QuestionFilter(SearchAndFilterSet):
     search_fields = ['question_text', 'creator__account__username',
                      'choice__choice_text']
-    search = CharFilter(method='keyword_search', label='Search')
 
     question_text = CharFilter(lookup_expr='icontains')
 
