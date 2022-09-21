@@ -2,7 +2,6 @@ from .views import file, question, user, vote
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
-app_name = 'cms_polls'
 urlpatterns = [
     path('', RedirectView.as_view(url='user/', permanent=True), name='index'),
     path('user/', include(user.UserViewSet().urls)),

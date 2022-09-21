@@ -26,6 +26,7 @@ urlpatterns = [
         authentication_form=EmailLoginForm),
         name="login"
     ),
+    # reserve `polls` namespace for polls urls in CMS
     path('polls/', include('polls.urls', namespace='app_polls')),
     path('cms/', include(frontend_urls)),
 ]

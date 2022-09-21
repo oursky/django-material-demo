@@ -10,4 +10,5 @@ class CmsPollsConfig(ModuleNamespaceMixin, AppConfig):
     verbose_name = 'Polls'
 
     base_url = 'polls/'
+    # this should match the app_name of the models
     namespace = 'polls'
