@@ -142,9 +142,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = ['polls.backends.EmailAuthBackend']
 
-LOGIN_URL = "/accounts/login/"
+LOGIN_URL = "/cms/accounts/login/"
 LOGIN_REDIRECT_URL = "/polls/"
-LOGOUT_REDIRECT_URL = "/accounts/login/"
+LOGOUT_REDIRECT_URL = "/cms/accounts/login/"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

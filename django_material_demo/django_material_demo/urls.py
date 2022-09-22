@@ -22,7 +22,7 @@ from polls.forms import EmailLoginForm
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Override login page from Frontend
-    path('accounts/login/', LoginView.as_view(
+    path('cms/accounts/login/', LoginView.as_view(
         authentication_form=EmailLoginForm),
         name="login"
     ),
