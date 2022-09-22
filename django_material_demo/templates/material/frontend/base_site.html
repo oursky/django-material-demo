@@ -9,6 +9,7 @@
 
 {% block js %}
     {{ block.super }}
+    <script src="{% static 'components/index.js' %}"></script>
     <script>
         var r = document.querySelector(':root');
         r.style.setProperty('--primary-color', "{% get_setting request 'primary_color' %}");
