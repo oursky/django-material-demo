@@ -1,11 +1,11 @@
 {% include './includes/top_nav.html' %}
 
 <p>
-    <a href={% url 'polls:home' %}>Home</a> >
+    <a href={% url 'app_polls:home' %}>Home</a> >
     <a class="active">{{ question.question_text }}</a>
 </p>
 
-<form action="{% url 'polls:vote' question.id %}" method="post">
+<form action="{% url 'app_polls:vote' question.id %}" method="post">
     {% csrf_token %}
     <fieldset>
         <legend><h1>{{ question.question_text }}</h1></legend>

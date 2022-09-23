@@ -1,8 +1,8 @@
 {% include './includes/top_nav.html' %}
 
 <p>
-    <a href={% url 'polls:home' %}>Home</a> >
-    <a href={% url 'polls:question' question.id %}>{{ question.question_text }}</a> >
+    <a href={% url 'app_polls:home' %}>Home</a> >
+    <a href={% url 'app_polls:question' question.id %}>{{ question.question_text }}</a> >
     <a class="active">Results</a>
 </p>
 
@@ -16,4 +16,4 @@
     </ul>
 </fieldset>
 
-<a href="{% url 'polls:question' question.id %}">Vote again?</a>
+<a href="{% url 'app_polls:question' question.id %}">Vote again?</a>

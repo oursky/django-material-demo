@@ -14,17 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth.views import LoginView
 from django.urls import include, path
 from material.frontend import urls as frontend_urls
-from django.contrib.auth.views import LoginView
 from polls.forms import EmailLoginForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Override login page from Frontend
-    path('accounts/login/', LoginView.as_view(
+    path('cms/accounts/login/', LoginView.as_view(
         authentication_form=EmailLoginForm),
         name="login"
     ),
-    path('', include(frontend_urls)),
+    # reserve `polls` namespace for polls urls in CMS
+    path('polls/', include('polls.urls', namespace='app_polls')),
+    path('cms/', include(frontend_urls)),
 ]
