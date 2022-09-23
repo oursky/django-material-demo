@@ -4,20 +4,6 @@ from django.db import models
 from django.utils import timezone
 
 
-class File(models.Model):
-    file_id = models.TextField()
-    storage_loc = models.TextField('storage location')
-    file_name = models.CharField(max_length=100)
-    file_type = models.TextField()
-    file_size = models.IntegerField()
-
-    class Meta:
-        ordering = ['file_name', 'id']
-
-    def __str__(self):
-        return self.file_name
-
-
 class User(models.Model):
     account = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -80,8 +66,7 @@ class Question(models.Model):
     question_text = models.CharField(max_length=200)
     total_vote_count = models.IntegerField(default=0)
 
-    thumbnail = models.ForeignKey(
-        File, on_delete=models.CASCADE, null=True, blank=True)
+    thumbnail = models.FileField(blank=True, null=True)
 
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='question_creates',
@@ -173,7 +158,7 @@ class Vote(models.Model):
 
 class Attachment(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    file = models.OneToOneField(File, on_delete=models.CASCADE)
+    file = models.FileField(blank=True, null=True)
 
     class Meta:
         ordering = ['file', 'id']

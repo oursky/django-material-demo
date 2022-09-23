@@ -2,6 +2,7 @@ asgiref==3.5.2
 Django==4.1
 django-filter==22.1
 django-material==1.10.0
+Pillow==9.2.0
 psycopg2==2.9.3
 python-dotenv==0.20.0
 PyYAML==6.0

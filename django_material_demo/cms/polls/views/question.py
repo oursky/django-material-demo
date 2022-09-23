@@ -1,6 +1,8 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms import BaseInlineFormSet, BooleanField, ModelForm
+from django.forms import (BaseInlineFormSet, BooleanField, FileField,
+                          ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput
 from django_filters import CharFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
@@ -14,6 +16,9 @@ from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
 
 
 class AttachmentsForm(FormSetForm):
+    file = FileField(label="Attachment",
+                     max_length=settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
+
     layout = Layout('file')
     parent_instance_field = 'question'
 
@@ -91,6 +96,8 @@ class MaxVoteCountForm(ModelForm, FieldDataMixin):
 
 
 class QuestionForm(SuperModelForm):
+    thumbnail = ImageField(required=False, label='Thumbnail',
+                           max_length=settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
     max_vote_count_control = NestedModelFormField(MaxVoteCountForm)
 
     # Formset fields
