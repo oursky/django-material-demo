@@ -1,1 +1,2 @@
-console.log("TEST");
+import "element-internals-polyfill";
+import "./switch";
