@@ -1,4 +1,7 @@
+{% load static %}
+
 {% include './includes/top_nav.html' %}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
 
 <p>
     <a class="active">Home</a>
@@ -9,7 +12,14 @@
     {% if latest_question_list %}
         <ul>
             {% for question in latest_question_list %}
-            <li><a href="{% url 'app_polls:question' question.id %}">{{ question.question_text }}</a></li>
+            <li><a href="{% url 'app_polls:question' question.id %}">
+                {{ question.question_text }}
+                {% if question.thumbnail %}
+                    {% with img=question.thumbnail %}
+                    <img class='thumbnail' src='{{img.url}}' alt='{{img.name}}'>
+                    {% endwith %}
+                {% endif %}
+            </a></li>
             {% endfor %}
         </ul>
     {% else %}
