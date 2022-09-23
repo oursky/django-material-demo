@@ -46,7 +46,9 @@ Demonstrate django admin site common use case.
 2. Run `make create-superuser` to create an account to access the admin site
 
 ## Dev Workflow
-- Run `make start` to start the web server. Then go to http://127.0.0.1:3000/admin to see the demo website
+- `cd django_material_demo`
+- Run `make -C components start` to build components.
+- In another terminal, run `make start` to start the web server. Then go to http://127.0.0.1:3000/polls to see the demo website
 - Run `make migrations` then `make migrate` for model migrations
 - Run `make clean` to remove the docker containers
 
