@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack watch --mode development"
+    "start": "webpack watch --mode development",
+    "build": "webpack --mode production"
   },
   "devDependencies": {
     "@types/react": "18.0.20",
