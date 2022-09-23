@@ -50,7 +50,8 @@ class AppSwitch extends HTMLElement {
     shadow.appendChild(mountPoint);
     shadow.appendChild(emotionRoot);
     const root = ReactDOM.createRoot(mountPoint);
-    this.value = this.getAttribute("checked") === null ? false : true;
+    this.value =
+      this.getAttribute("checked")?.toLowerCase() === "true" ? true : false;
 
     root.render(
       <CacheProvider value={cache}>

@@ -8,6 +8,7 @@ from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, ListModelView,
                                      ModelViewSet, UpdateModelView)
 from polls.models import Attachment, Choice, Question, QuestionFollower
+from components.widgets.switch import Switch
 
 from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
                       ListFilterView, NestedModelFormField, SearchAndFilterSet)
@@ -130,6 +131,9 @@ class QuestionForm(SuperModelForm):
                   'vote_start', 'vote_end', 'show_vote', 'has_max_vote_count',
                   'max_vote_count', 'min_selection', 'max_selection',
                   'allow_custom']
+        widgets = {
+            'show_creator': Switch,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
