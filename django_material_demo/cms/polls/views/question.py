@@ -286,20 +286,26 @@ class QuestionDetailView(DetailModelView):
             if item[0] == thumbnail_name:
                 # Skip if no image
                 if item[1]:
+                    #TODO: replace with template
                     image_html = mark_safe(
                         f"<img class='thumbnail' src='{item[1].url}' "
                         f"alt='{item[1].name}'>")
                     yield (item[0], image_html)
+                else:
+                    yield (item[0], 'None')
             else:
                 yield item
 
         attachments = question.attachment_set.all()
         if len(attachments):
+            #TODO: replace with template
             attachments = [
                 mark_safe(f"<a href='{x.file.url}'>{x.file.name}</a>")
                 for x in attachments]
             html_list = get_html_list(attachments)
             yield ('Attachments', html_list)
+        else:
+            yield ('Attachments', 'None')
 
 
 class QuestionViewSet(ModelViewSet):

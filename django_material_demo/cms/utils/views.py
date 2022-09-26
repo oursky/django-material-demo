@@ -16,6 +16,7 @@ def get_html_list(arr):
     if len(arr) == 0:
         return ''
 
+    #TODO: replace with template
     value_list = [conditional_escape(x) for x in arr]
     value_list_html = mark_safe(
         '<ul>'
