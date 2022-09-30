@@ -1,23 +1,6 @@
 from django.contrib import admin
-from django.conf import settings
-from django.contrib.auth import get_user_model
 
-from .models import Attachment, Choice, File, Question, User, UserFollower, Vote
-
-
-@admin.register(File)
-class FileAdmin(admin.ModelAdmin):
-    readonly_fields = [
-        'file_id',
-        'storage_loc',
-        'file_name',
-        'file_type',
-        'file_size',
-    ]
-
-    list_display = ['file_name', 'file_type', 'file_size', 'storage_loc']
-    list_filter = ['file_type', 'storage_loc']
-    search_fields = ['file_name']
+from .models import Attachment, Choice, Question, User, UserFollower, Vote
 
 
 class FollowedQuestion(admin.TabularInline):

@@ -1,4 +1,4 @@
-from .views import file, question, user, vote
+from .views import question, user, vote
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
@@ -12,7 +12,6 @@ urlpatterns = [
         user.PasswordChangeDoneView.as_view(),
         name="password_change_done",),
 
-    path('file/', include(file.FileViewSet().urls)),
     path('question/', include(question.QuestionViewSet().urls)),
     path('vote/', include(vote.VoteViewSet().urls)),
 ]

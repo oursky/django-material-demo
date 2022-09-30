@@ -8,3 +8,8 @@
 .input-field .button-group > * {
   margin: 4px;
 }
+
+img.thumbnail {
+  max-width: 48px;
+  max-height: 48px;
+}

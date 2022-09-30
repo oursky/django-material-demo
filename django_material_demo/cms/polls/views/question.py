@@ -1,19 +1,27 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms import BaseInlineFormSet, BooleanField, ModelForm
+from django.forms import (BaseInlineFormSet, BooleanField, FileField,
+                          ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput
+from django.utils.safestring import mark_safe
 from django_filters import CharFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
-from material.frontend.views import (CreateModelView, ListModelView,
-                                     ModelViewSet, UpdateModelView)
+from material.frontend.views import (CreateModelView, DetailModelView,
+                                     ListModelView, ModelViewSet,
+                                     UpdateModelView)
 from polls.models import Attachment, Choice, Question, QuestionFollower
 
 from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
-                      ListFilterView, NestedModelFormField, SearchAndFilterSet)
+                      ListFilterView, NestedModelFormField, SearchAndFilterSet,
+                      get_html_list)
 
 
 class AttachmentsForm(FormSetForm):
+    file = FileField(label="Attachment",
+                     max_length=settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
+
     layout = Layout('file')
     parent_instance_field = 'question'
 
@@ -91,6 +99,8 @@ class MaxVoteCountForm(ModelForm, FieldDataMixin):
 
 
 class QuestionForm(SuperModelForm):
+    thumbnail = ImageField(required=False, label='Thumbnail',
+                           max_length=settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
     max_vote_count_control = NestedModelFormField(MaxVoteCountForm)
 
     # Formset fields
@@ -267,8 +277,40 @@ class QuestionListView(ListModelView, ListFilterView):
     filterset_class = QuestionFilter
 
 
+class QuestionDetailView(DetailModelView):
+    def get_object_data(self):
+        question = super().get_object()
+        thumbnail_name = Question._meta.get_field('thumbnail')
+        thumbnail_name = thumbnail_name.verbose_name.title()
+        for item in super().get_object_data():
+            if item[0] == thumbnail_name:
+                # Skip if no image
+                if item[1]:
+                    #TODO: replace with template
+                    image_html = mark_safe(
+                        f"<img class='thumbnail' src='{item[1].url}' "
+                        f"alt='{item[1].name}'>")
+                    yield (item[0], image_html)
+                else:
+                    yield (item[0], 'None')
+            else:
+                yield item
+
+        attachments = question.attachment_set.all()
+        if len(attachments):
+            #TODO: replace with template
+            attachments = [
+                mark_safe(f"<a href='{x.file.url}'>{x.file.name}</a>")
+                for x in attachments]
+            html_list = get_html_list(attachments)
+            yield ('Attachments', html_list)
+        else:
+            yield ('Attachments', 'None')
+
+
 class QuestionViewSet(ModelViewSet):
     model = Question
     create_view_class = QuestionCreateView
     update_view_class = QuestionUpdateView
     list_view_class = QuestionListView
+    detail_view_class = QuestionDetailView

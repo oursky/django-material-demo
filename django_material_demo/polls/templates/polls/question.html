@@ -1,4 +1,7 @@
+{% load static %}
+
 {% include './includes/top_nav.html' %}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
 
 <p>
     <a href={% url 'app_polls:home' %}>Home</a> >
@@ -8,7 +11,13 @@
 <form action="{% url 'app_polls:vote' question.id %}" method="post">
     {% csrf_token %}
     <fieldset>
-        <legend><h1>{{ question.question_text }}</h1></legend>
+        <legend><h1>{{ question.question_text }}
+        {% if question.thumbnail %}
+            {% with img=question.thumbnail %}
+            <img class='thumbnail' src='{{img.url}}' alt='{{img.name}}'>
+            {% endwith %}
+        {% endif %}
+        </h1></legend>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
         {% for choice in question.choice_set.all %}
             <label for="choice{{ forloop.counter }}">
@@ -16,6 +25,16 @@
                 <span>{{ choice.choice_text }}</span>
             </label><br>
         {% endfor %}
+        {% if question.attachment_set.count %}
+            <h2>Attachments</h2>
+            <ul>
+            {% for attachment in question.attachment_set.all %}
+                <li><a href='{{attachment.file.url}}'>
+                    {{attachment.file.name}}
+                </a></li>
+            {% endfor %}
+            </ul>
+        {% endif %}
     </fieldset>
     <input type="submit" value="Vote">
 </form>
