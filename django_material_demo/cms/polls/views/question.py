@@ -5,7 +5,6 @@ from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput
 from django.utils import dateparse, timezone
-from django.utils.safestring import mark_safe
 from django_filters import CharFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
@@ -16,7 +15,7 @@ from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
 from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
                       ListFilterView, NestedModelFormField, SearchAndFilterSet,
-                      get_html_list)
+                      get_html_anchor, get_html_list, get_html_image)
 
 
 class AttachmentsForm(FormSetForm):
@@ -310,12 +309,11 @@ class QuestionDetailView(DetailModelView):
         thumbnail_name = thumbnail_name.verbose_name.title()
         for item in super().get_object_data():
             if item[0] == thumbnail_name:
-                # Skip if no image
                 if item[1]:
-                    # TODO: replace with template
-                    image_html = mark_safe(
-                        f"<img class='thumbnail' src='{item[1].url}' "
-                        f"alt='{item[1].name}'>")
+                    attrs = {'class': 'thumbnail',
+                             'src': item[1].url,
+                             'alt': item[1].name}
+                    image_html = get_html_image(attrs)
                     yield (item[0], image_html)
                 else:
                     yield (item[0], 'None')
@@ -323,15 +321,14 @@ class QuestionDetailView(DetailModelView):
                 yield item
 
         attachments = question.attachment_set.all()
-        if len(attachments):
-            # TODO: replace with template
-            attachments = [
-                mark_safe(f"<a href='{x.file.url}'>{x.file.name}</a>")
-                for x in attachments]
-            html_list = get_html_list(attachments)
-            yield ('Attachments', html_list)
-        else:
-            yield ('Attachments', 'None')
+        attachment_links = []
+        for attachment in attachments:
+            content = attachment.file.name
+            attrs = {'href': attachment.file.url,
+                     'download': True}
+            attachment_links.append(get_html_anchor(content, attrs))
+        html_list = get_html_list(attachment_links)
+        yield ('Attachments', html_list)
 
 
 class QuestionViewSet(ModelViewSet):
