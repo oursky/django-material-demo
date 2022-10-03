@@ -4,6 +4,7 @@ from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput
+from django.utils import dateparse, timezone
 from django.utils.safestring import mark_safe
 from django_filters import CharFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
@@ -98,7 +99,7 @@ class MaxVoteCountForm(ModelForm, FieldDataMixin):
         js = ['js/reload_form.js']
 
 
-class QuestionForm(SuperModelForm):
+class QuestionForm(SuperModelForm, FieldDataMixin):
     thumbnail = ImageField(required=False, label='Thumbnail',
                            max_length=settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
     max_vote_count_control = NestedModelFormField(MaxVoteCountForm)
@@ -144,6 +145,10 @@ class QuestionForm(SuperModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.set_initial_data()
+        self.disable_fields_conditionally()
+
+    def set_initial_data(self):
         self.formsets["attachments"].header = 'Attachments'
         self.formsets["q_followers"].header = 'Followers'
         self.formsets["choices"].header = 'Choices'
@@ -162,10 +167,23 @@ class QuestionForm(SuperModelForm):
             self.initial["choices"] = choices_queryset
             self.formsets["choices"].queryset = choices_queryset
 
+    def disable_fields_conditionally(self):
+        # Prevent changing question when poll in progress
+        vote_start = dateparse.parse_datetime(
+            str(self.get_field_value('vote_start')))
+        vote_end = dateparse.parse_datetime(
+            str(self.get_field_value('vote_end')))
+        if vote_start and vote_end:
+            vote_start = vote_start.timestamp()
+            vote_end = vote_end.timestamp()
+            now = timezone.now().timestamp()
+            if vote_start <= now <= vote_end:
+                self.fields['question_text'].disabled = True
+
     # Related field validations
     def check_vote_end(self):
-        vote_end = self.cleaned_data['vote_end']
-        vote_start = self.cleaned_data['vote_start']
+        vote_end = self.cleaned_data.get('vote_end', None)
+        vote_start = self.cleaned_data.get('vote_start', None)
 
         if (vote_start is not None
                 and vote_end is not None
@@ -175,8 +193,8 @@ class QuestionForm(SuperModelForm):
                 'vote_end_too_early'))
 
     def check_max_vote_count(self):
-        max_vote_count = self.cleaned_data['max_vote_count']
-        has_max_vote_count = self.cleaned_data['has_max_vote_count']
+        max_vote_count = self.cleaned_data.get('max_vote_count', None)
+        has_max_vote_count = self.cleaned_data.get('has_max_vote_count', None)
 
         if max_vote_count is None and has_max_vote_count:
             self.add_error('max_vote_count',
@@ -189,8 +207,8 @@ class QuestionForm(SuperModelForm):
                                            'max_vote_count_positive'))
 
     def check_selection_bounds(self):
-        min_selection = self.cleaned_data['min_selection']
-        max_selection = self.cleaned_data['max_selection']
+        min_selection = self.cleaned_data.get('min_selection', None)
+        max_selection = self.cleaned_data.get('max_selection', None)
         choices = self.formsets['choices']
 
         if (min_selection is not None
@@ -210,13 +228,13 @@ class QuestionForm(SuperModelForm):
                 params={'len': len(choices)}))
 
     def check_total_vote_count(self):
-        total_vote_count = self.cleaned_data['total_vote_count']
+        total_vote_count = self.cleaned_data.get('total_vote_count', None)
 
         has_max_vote_count = self.cleaned_data.get('has_max_vote_count', None)
         if not has_max_vote_count:
             return total_vote_count
 
-        max_vote_count = self.cleaned_data['max_vote_count']
+        max_vote_count = self.cleaned_data.get('max_vote_count', None)
 
         if max_vote_count and total_vote_count > max_vote_count:
             self.add_error('max_vote_count', ValidationError(
@@ -286,7 +304,7 @@ class QuestionDetailView(DetailModelView):
             if item[0] == thumbnail_name:
                 # Skip if no image
                 if item[1]:
-                    #TODO: replace with template
+                    # TODO: replace with template
                     image_html = mark_safe(
                         f"<img class='thumbnail' src='{item[1].url}' "
                         f"alt='{item[1].name}'>")
@@ -298,7 +316,7 @@ class QuestionDetailView(DetailModelView):
 
         attachments = question.attachment_set.all()
         if len(attachments):
-            #TODO: replace with template
+            # TODO: replace with template
             attachments = [
                 mark_safe(f"<a href='{x.file.url}'>{x.file.name}</a>")
                 for x in attachments]
