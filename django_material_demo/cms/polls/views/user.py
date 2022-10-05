@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
+from django.core.exceptions import ValidationError
 from django.db.models import Count
-from django.forms import EmailField, model_to_dict
+from django.forms import EmailField, IntegerField
 from django.forms.widgets import RadioSelect
 from django.http import HttpResponse
 from django.views import generic
@@ -68,6 +71,9 @@ class FollowedQuestionsForm(FormSetForm):
 
 class UserForm(SuperModelForm):
     account = ForeignKeyFormField(AccountForm)
+    subs_day_count = IntegerField(min_value=0, required=False,
+                                  label='Subscription duration (in days)')
+
     followed_users = InlineFormSetField(parent_model=User,
                                         model=UserFollower,
                                         form=FollowedUsersForm,
@@ -79,14 +85,14 @@ class UserForm(SuperModelForm):
     layout = Layout(
         'account',
         'group',
-        Row('subs_start', 'subs_expire'),
+        Row('subs_start', 'subs_day_count'),
         'followed_users',
         'followed_questions',
     )
 
     class Meta:
         model = User
-        fields = ['group', 'subs_start', 'subs_expire']
+        fields = ['group', 'subs_start']
         widgets = {'group': RadioSelect}
 
     def __init__(self, *args, **kwargs):
@@ -99,6 +105,11 @@ class UserForm(SuperModelForm):
             account_qs = self.instance.account
             self.initial["account"] = account_qs
 
+            if self.instance.subs_start and self.instance.subs_expire:
+                date_delta = (self.instance.subs_expire
+                              - self.instance.subs_start)
+                self.initial["subs_day_count"] = date_delta.days
+
             followed_users_qs = (
                 self.instance.user_follows.order_by('-ordering'))
             self.initial["followed_users"] = followed_users_qs
@@ -108,6 +119,25 @@ class UserForm(SuperModelForm):
                 self.instance.questionfollower_set.order_by('-ordering'))
             self.initial["followed_questions"] = followed_questions_qs
             self.formsets["followed_questions"].queryset = followed_questions_qs
+
+    def clean(self):
+        super().clean()
+        subs_start = self.cleaned_data.get('subs_start', None)
+        subs_day_count = self.cleaned_data.get('subs_day_count', None)
+        if subs_start is None and subs_day_count is not None:
+            self.add_error('subs_start', ValidationError(
+                'This field is required if subscription duration is provided.',
+                'required'))
+
+    def save(self, commit=True):
+        instance = super().save(commit)
+        subs_start = instance.subs_start
+        subs_day_count = self.cleaned_data.get('subs_day_count', None)
+        if subs_start and subs_day_count is not None:
+            subs_expire = subs_start + timedelta(days=subs_day_count)
+            instance.subs_expire = subs_expire
+            instance.save()
+        return instance
 
 
 class UserUpdateView(UpdateModelView):
