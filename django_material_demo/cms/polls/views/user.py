@@ -6,13 +6,15 @@ from django.forms.widgets import RadioSelect
 from django.http import HttpResponse
 from django.views import generic
 from django_filters import CharFilter, NumberFilter
-from library.django_superform import ForeignKeyFormField, SuperModelForm
+from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
+                                      SuperModelForm)
 from material import Layout, Row
 from material.frontend.views import (DetailModelView, ListModelView,
                                      ModelViewSet, UpdateModelView)
-from polls.models import User
+from polls.models import QuestionFollower, User, UserFollower
 
-from ...utils import ListFilterView, SearchAndFilterSet, get_html_list
+from ...utils import (FormSetForm, ListFilterView, SearchAndFilterSet,
+                      get_html_list)
 
 
 class AccountForm(UserChangeForm):
@@ -31,31 +33,69 @@ class AccountForm(UserChangeForm):
     )
 
 
+class FollowedUsersForm(FormSetForm):
+    layout = Layout(Row('followed_user', 'ordering'),
+                    Row('enable_email_notify', 'notify_time'))
+    parent_instance_field = 'follower'
+
+    class Meta:
+        model = UserFollower
+        fields = ['followed_user', 'ordering',
+                  'enable_email_notify', 'notify_time']
+
+
+class FollowedQuestionsForm(FormSetForm):
+    layout = Layout(Row('question', 'ordering'),
+                    Row('enable_email_notify', 'notify_time'))
+    parent_instance_field = 'follower'
+
+    class Meta:
+        model = QuestionFollower
+        fields = ['question', 'ordering', 'enable_email_notify', 'notify_time']
+
+
 class UserForm(SuperModelForm):
     account = ForeignKeyFormField(AccountForm)
+    followed_users = InlineFormSetField(parent_model=User,
+                                        model=UserFollower,
+                                        form=FollowedUsersForm,
+                                        fk_name='follower', extra=0)
+    followed_questions = InlineFormSetField(parent_model=User,
+                                            model=QuestionFollower,
+                                            form=FollowedQuestionsForm, extra=0)
 
     layout = Layout(
         'account',
         'group',
         Row('subs_start', 'subs_expire'),
-        'followed_users'
+        'followed_users',
+        'followed_questions',
     )
-
-    form_widgets = {'group': RadioSelect}
 
     class Meta:
         model = User
-        fields = ['group', 'subs_start', 'subs_expire',
-                  'followed_users']
+        fields = ['group', 'subs_start', 'subs_expire']
+        widgets = {'group': RadioSelect}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.instance:
-            self.initial = model_to_dict(self.instance)
+        self.formsets["followed_users"].header = 'Followed Users'
+        self.formsets["followed_questions"].header = 'Followed Questions'
 
-            account_queryset = self.instance.account
-            self.initial["account"] = account_queryset
+        if self.instance and self.instance.pk:
+            account_qs = self.instance.account
+            self.initial["account"] = account_qs
+
+            followed_users_qs = (
+                self.instance.user_follows.order_by('-ordering'))
+            self.initial["followed_users"] = followed_users_qs
+            self.formsets["followed_users"].queryset = followed_users_qs
+
+            followed_questions_qs = (
+                self.instance.questionfollower_set.order_by('-ordering'))
+            self.initial["followed_questions"] = followed_questions_qs
+            self.formsets["followed_questions"].queryset = followed_questions_qs
 
 
 class UserUpdateView(UpdateModelView):
