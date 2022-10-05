@@ -12,7 +12,7 @@ from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
                                      UpdateModelView)
-from polls.models import Attachment, Choice, Question, QuestionFollower
+from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
 from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
                       ListFilterView, NestedModelFormField, SearchAndFilterSet,
@@ -262,6 +262,14 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
 
 class QuestionCreateView(CreateModelView, GetParamAsFormDataMixin):
+    def get_initial(self):
+        initial = super().get_initial()
+        # Set initial creator to current user
+        user = User.objects.filter(account=self.request.user)
+        if len(user) == 1:
+            initial['creator'] = user[0]
+        return initial
+
     def get_form_class(self):
         return QuestionForm
 

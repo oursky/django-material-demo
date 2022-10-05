@@ -1,18 +1,23 @@
+from datetime import timedelta
+
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
+from django.core.exceptions import ValidationError
 from django.db.models import Count
-from django.forms import EmailField, model_to_dict
+from django.forms import EmailField, IntegerField
 from django.forms.widgets import RadioSelect
 from django.http import HttpResponse
 from django.views import generic
 from django_filters import CharFilter, NumberFilter
-from library.django_superform import ForeignKeyFormField, SuperModelForm
+from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
+                                      SuperModelForm)
 from material import Layout, Row
 from material.frontend.views import (DetailModelView, ListModelView,
                                      ModelViewSet, UpdateModelView)
-from polls.models import User
+from polls.models import QuestionFollower, User, UserFollower
 
-from ...utils import ListFilterView, SearchAndFilterSet, get_html_list
+from ...utils import (FormSetForm, ListFilterView, SearchAndFilterSet,
+                      get_html_list)
 
 
 class AccountForm(UserChangeForm):
@@ -31,31 +36,108 @@ class AccountForm(UserChangeForm):
     )
 
 
+class FollowedUsersForm(FormSetForm):
+    layout = Layout(Row('followed_user', 'ordering'),
+                    Row('enable_email_notify', 'notify_time'))
+    parent_instance_field = 'follower'
+
+    class Meta:
+        model = UserFollower
+        fields = ['followed_user', 'ordering',
+                  'enable_email_notify', 'notify_time']
+
+    def clean_notify_time(self):
+        time = self.cleaned_data['notify_time']
+        if time:
+            time = time.replace(second=0, microsecond=0)
+        return time
+
+
+class FollowedQuestionsForm(FormSetForm):
+    layout = Layout(Row('question', 'ordering'),
+                    Row('enable_email_notify', 'notify_time'))
+    parent_instance_field = 'follower'
+
+    class Meta:
+        model = QuestionFollower
+        fields = ['question', 'ordering', 'enable_email_notify', 'notify_time']
+
+    def clean_notify_time(self):
+        time = self.cleaned_data['notify_time']
+        if time:
+            time = time.replace(second=0, microsecond=0)
+        return time
+
+
 class UserForm(SuperModelForm):
     account = ForeignKeyFormField(AccountForm)
+    subs_day_count = IntegerField(min_value=0, required=False,
+                                  label='Subscription duration (in days)')
+
+    followed_users = InlineFormSetField(parent_model=User,
+                                        model=UserFollower,
+                                        form=FollowedUsersForm,
+                                        fk_name='follower', extra=0)
+    followed_questions = InlineFormSetField(parent_model=User,
+                                            model=QuestionFollower,
+                                            form=FollowedQuestionsForm, extra=0)
 
     layout = Layout(
         'account',
         'group',
-        Row('subs_start', 'subs_expire'),
-        'followed_users'
+        Row('subs_start', 'subs_day_count'),
+        'followed_users',
+        'followed_questions',
     )
-
-    form_widgets = {'group': RadioSelect}
 
     class Meta:
         model = User
-        fields = ['group', 'subs_start', 'subs_expire',
-                  'followed_users']
+        fields = ['group', 'subs_start']
+        widgets = {'group': RadioSelect}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.instance:
-            self.initial = model_to_dict(self.instance)
+        self.formsets["followed_users"].header = 'Followed Users'
+        self.formsets["followed_questions"].header = 'Followed Questions'
 
-            account_queryset = self.instance.account
-            self.initial["account"] = account_queryset
+        if self.instance and self.instance.pk:
+            account_qs = self.instance.account
+            self.initial["account"] = account_qs
+
+            if self.instance.subs_start and self.instance.subs_expire:
+                date_delta = (self.instance.subs_expire
+                              - self.instance.subs_start)
+                self.initial["subs_day_count"] = date_delta.days
+
+            followed_users_qs = (
+                self.instance.user_follows.order_by('-ordering'))
+            self.initial["followed_users"] = followed_users_qs
+            self.formsets["followed_users"].queryset = followed_users_qs
+
+            followed_questions_qs = (
+                self.instance.questionfollower_set.order_by('-ordering'))
+            self.initial["followed_questions"] = followed_questions_qs
+            self.formsets["followed_questions"].queryset = followed_questions_qs
+
+    def clean(self):
+        super().clean()
+        subs_start = self.cleaned_data.get('subs_start', None)
+        subs_day_count = self.cleaned_data.get('subs_day_count', None)
+        if subs_start is None and subs_day_count is not None:
+            self.add_error('subs_start', ValidationError(
+                'This field is required if subscription duration is provided.',
+                'required'))
+
+    def save(self, commit=True):
+        instance = super().save(commit)
+        subs_start = instance.subs_start
+        subs_day_count = self.cleaned_data.get('subs_day_count', None)
+        if subs_start and subs_day_count is not None:
+            subs_expire = subs_start + timedelta(days=subs_day_count)
+            instance.subs_expire = subs_expire
+            instance.save()
+        return instance
 
 
 class UserUpdateView(UpdateModelView):
