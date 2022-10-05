@@ -43,6 +43,12 @@ class FollowedUsersForm(FormSetForm):
         fields = ['followed_user', 'ordering',
                   'enable_email_notify', 'notify_time']
 
+    def clean_notify_time(self):
+        time = self.cleaned_data['notify_time']
+        if time:
+            time = time.replace(second=0, microsecond=0)
+        return time
+
 
 class FollowedQuestionsForm(FormSetForm):
     layout = Layout(Row('question', 'ordering'),
@@ -52,6 +58,12 @@ class FollowedQuestionsForm(FormSetForm):
     class Meta:
         model = QuestionFollower
         fields = ['question', 'ordering', 'enable_email_notify', 'notify_time']
+
+    def clean_notify_time(self):
+        time = self.cleaned_data['notify_time']
+        if time:
+            time = time.replace(second=0, microsecond=0)
+        return time
 
 
 class UserForm(SuperModelForm):
