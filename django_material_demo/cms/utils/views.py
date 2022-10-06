@@ -4,24 +4,6 @@ from operator import or_
 from django.db.models import Q
 from django_filters import CharFilter, FilterSet
 from django_filters.views import FilterView
-from django.template.loader import render_to_string
-
-
-def get_html_list(items):
-    """Generate a HTML unordered list from an iterable
-
-    Return an empty string instead when iterable is empty
-    """
-    return render_to_string('data/ul.html', {'items': items})
-
-
-def get_html_image(attrs):
-    return render_to_string('data/img.html', {'attrs': attrs})
-
-
-def get_html_anchor(content, attrs):
-    ctx = {'attrs': attrs, 'content': content}
-    return render_to_string('data/a.html', ctx)
 
 
 class ListFilterView(FilterView):

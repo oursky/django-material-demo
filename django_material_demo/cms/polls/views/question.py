@@ -4,6 +4,7 @@ from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput
+from django.template.loader import render_to_string
 from django.utils import dateparse, timezone
 from django_filters import CharFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
@@ -14,8 +15,7 @@ from material.frontend.views import (CreateModelView, DetailModelView,
 from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
 from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
-                      ListFilterView, NestedModelFormField, SearchAndFilterSet,
-                      get_html_anchor, get_html_list, get_html_image)
+                      ListFilterView, NestedModelFormField, SearchAndFilterSet)
 
 
 class AttachmentsForm(FormSetForm):
@@ -310,10 +310,12 @@ class QuestionDetailView(DetailModelView):
         for item in super().get_object_data():
             if item[0] == thumbnail_name:
                 if item[1]:
-                    attrs = {'class': 'thumbnail',
-                             'src': item[1].url,
-                             'alt': item[1].name}
-                    image_html = get_html_image(attrs)
+                    ctx = {'attrs': {
+                        'class': 'thumbnail',
+                        'src': item[1].url,
+                        'alt': item[1].name
+                    }}
+                    image_html = render_to_string('data/img.html', ctx)
                     yield (item[0], image_html)
                 else:
                     yield (item[0], 'None')
@@ -323,11 +325,16 @@ class QuestionDetailView(DetailModelView):
         attachments = question.attachment_set.all()
         attachment_links = []
         for attachment in attachments:
-            content = attachment.file.name
-            attrs = {'href': attachment.file.url,
-                     'download': True}
-            attachment_links.append(get_html_anchor(content, attrs))
-        html_list = get_html_list(attachment_links)
+            ctx = {
+                'content': attachment.file.name,
+                'attrs': {
+                    'href': attachment.file.url,
+                    'download': True
+                },
+            }
+            attachment_links.append(render_to_string('data/a.html', ctx))
+        ctx = {'items': attachment_links}
+        html_list = render_to_string('data/ul.html', ctx)
         yield ('Attachments', html_list)
 
 
