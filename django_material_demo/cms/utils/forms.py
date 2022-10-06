@@ -2,6 +2,7 @@ from django.forms import ModelForm
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.edit import (ModelFormMixin, ProcessFormView,
                                        UpdateView)
+from django.forms import widgets
 from library.django_superform import ModelFormField
 
 
@@ -30,6 +31,13 @@ class NestedModelFormField(ModelFormField):
         if form._meta.model != self.form_class._meta.model:
             raise ValueError('Field model must be same as the form model')
         return form.instance
+
+
+class RangeInput(widgets.Input):
+    input_type = 'range'
+
+    class Media:
+        js = ['js/range_input.js']
 
 
 class GetParamAsFormDataMixin(SingleObjectTemplateResponseMixin,

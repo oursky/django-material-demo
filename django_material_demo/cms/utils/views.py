@@ -26,6 +26,12 @@ class ListFilterView(FilterView):
         context.update({'filter': self.filterset})
         return context
 
+    def total(self):
+        if hasattr(super(), 'get_object_list'):
+            return super().get_object_list().count()
+        else:
+            return super().total()
+
 
 class SearchAndFilterSet(FilterSet):
     # fields to search values from

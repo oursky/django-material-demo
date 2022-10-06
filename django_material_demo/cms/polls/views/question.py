@@ -5,8 +5,8 @@ from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput
 from django.template.loader import render_to_string
-from django.utils import dateparse, timezone
-from django_filters import CharFilter
+from django.utils import timezone
+from django_filters import DateTimeFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
@@ -278,15 +278,18 @@ class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
 
 class QuestionFilterForm(forms.Form):
     layout = Layout('search',
-                    'question_text',
-                    'show_vote')
+                    'show_vote',
+                    'pub_date__gt', 'pub_date__lt')
 
 
 class QuestionFilter(SearchAndFilterSet):
     search_fields = ['question_text', 'creator__account__username',
                      'choice__choice_text']
 
-    question_text = CharFilter(lookup_expr='icontains')
+    pub_date__gt = DateTimeFilter(field_name='pub_date', lookup_expr='gt',
+                                  label='Published after')
+    pub_date__lt = DateTimeFilter(field_name='pub_date', lookup_expr='lt',
+                                  label='Published before')
 
     class Meta:
         model = Question
@@ -295,8 +298,10 @@ class QuestionFilter(SearchAndFilterSet):
 
 
 class QuestionListView(ListModelView, ListFilterView):
-    list_display = ['question_text', 'creator', 'choice_list',
-                    'vote_start', 'vote_end', 'selection_bounds']
+    list_display = [
+        'question_text', 'creator', 'choice_list', 'show_vote',
+        'pub_date', 'total_vote_count'
+    ]
     filterset_class = QuestionFilter
 
 

@@ -43,7 +43,7 @@ class User(models.Model):
     def followers_list(self):
         users = UserFollower.objects.filter(followed_user=self)
         users = users.order_by('-ordering', 'follower__account__username')
-        return [x.follower.name for x in users]
+        return list(users.values_list('follower__account__username', flat=True))
 
 
 class UserFollower(models.Model):
@@ -117,7 +117,7 @@ class Question(models.Model):
     def choice_list(self):
         choices = Choice.objects.filter(question=self)
         choices = choices.order_by('choice_text')
-        return [choice.choice_text for choice in choices]
+        return list(choices.values_list('choice_text', flat=True))
 
 
 class Choice(models.Model):
