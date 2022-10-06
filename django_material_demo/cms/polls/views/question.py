@@ -168,16 +168,14 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
     def disable_fields_conditionally(self):
         # Prevent changing question when poll in progress
-        vote_start = dateparse.parse_datetime(
-            str(self.get_field_value('vote_start')))
-        vote_end = dateparse.parse_datetime(
-            str(self.get_field_value('vote_end')))
-        if vote_start and vote_end:
-            vote_start = vote_start.timestamp()
-            vote_end = vote_end.timestamp()
+        try:
+            vote_start = self.get_field_value('vote_start').timestamp()
+            vote_end = self.get_field_value('vote_end').timestamp()
             now = timezone.now().timestamp()
-            if vote_start <= now <= vote_end:
-                self.fields['question_text'].disabled = True
+            self.fields['question_text'].disabled = (
+                vote_start <= now <= vote_end)
+        except AttributeError:
+            pass  # vote_start/vote_end field value is None
 
     # Related field validations
     def check_vote_end(self):
