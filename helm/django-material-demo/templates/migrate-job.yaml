@@ -18,7 +18,7 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: Always
         command: ["python"]
-        args: ["manage.py", "migrate"]
+        args: ["manage.py", "migrate", "--no-input"]
         envFrom:
           - configMapRef:
               name: env
