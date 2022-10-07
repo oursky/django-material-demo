@@ -8,7 +8,7 @@ __all__ = (
     'FormSetForm',
     'GetParamAsFormDataMixin',
     'NestedModelFormField',
-    'RangeInput'
+    'RangeInput',
     'ModuleNamespaceMixin',
     'ListFilterView',
     'SearchAndFilterSet',

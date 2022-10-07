@@ -223,7 +223,11 @@ var DataTable = /*#__PURE__*/function (_HTMLElement) {
           data['datatable-' + key] = value;
         }
 
-        Object.assign(data, Object.fromEntries(new URLSearchParams(window.location.search).entries()));
+        var newData = new URLSearchParams(window.location.search);
+        for (var [k, v] of new URLSearchParams($.param(data))) {
+          newData.append(k, v);
+        }
+        return newData.toString();
       };
 
       config['ajax']['beforeSend'] = function (request) {

@@ -3,10 +3,10 @@ from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
-from django.forms.widgets import CheckboxInput
+from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django_filters import DateTimeFilter
+from django_filters import DateTimeFilter, TypedMultipleChoiceFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
@@ -279,7 +279,12 @@ class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
 class QuestionFilterForm(forms.Form):
     layout = Layout('search',
                     'show_vote',
+                    'creator__isnull',
                     'pub_date__gt', 'pub_date__lt')
+
+
+def str_to_bool(s):
+    return str(s).lower() in ['true', 'yes', '1']
 
 
 class QuestionFilter(SearchAndFilterSet):
@@ -291,9 +296,14 @@ class QuestionFilter(SearchAndFilterSet):
     pub_date__lt = DateTimeFilter(field_name='pub_date', lookup_expr='lt',
                                   label='Published before')
 
+    NEGATED_BOOLEAN_CHOICES = ((False, 'Yes'), (True, 'No'))
+    creator__isnull = TypedMultipleChoiceFilter(
+        choices=NEGATED_BOOLEAN_CHOICES, label='Has creator',
+        coerce=str_to_bool, widget=CheckboxSelectMultiple)
+
     class Meta:
         model = Question
-        fields = {'show_vote': ['exact']}
+        fields = {'show_vote': ['exact'], 'creator': ['isnull']}
         form = QuestionFilterForm
 
 

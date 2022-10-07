@@ -9,7 +9,7 @@ from django.forms.widgets import RadioSelect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views import generic
-from django_filters import CharFilter, NumberFilter
+from django_filters import CharFilter, MultipleChoiceFilter, NumberFilter
 from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                       SuperModelForm)
 from material import Layout, Row
@@ -212,15 +212,14 @@ class UserDetailView(DetailModelView):
 class UserFilterForm(forms.Form):
     layout = Layout('search',
                     'group',
-                    'account__username',
                     'min_follower_count')
 
 
 class UserFilter(SearchAndFilterSet):
     search_fields = ['account__username', 'group']
 
-    account__username = CharFilter(lookup_expr='icontains',
-                                   label='Name contains')
+    group_choices = User._meta.get_field('group').get_choices(False)
+    group = MultipleChoiceFilter(choices=group_choices)
 
     highest_follower_count = max(
         User.objects.annotate(count=Count('user_followed'))
