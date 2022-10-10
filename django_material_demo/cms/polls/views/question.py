@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.db.models import F
 from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple
@@ -14,8 +15,10 @@ from material.frontend.views import (CreateModelView, DetailModelView,
                                      UpdateModelView)
 from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
-from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
-                      ListFilterView, NestedModelFormField, SearchAndFilterSet)
+from ...utils.forms import (FieldDataMixin, FormSetForm,
+                            GetParamAsFormDataMixin, NestedModelFormField)
+from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
+                            ListFilterView, SearchAndFilterSet)
 
 
 class AttachmentsForm(FormSetForm):
@@ -307,12 +310,28 @@ class QuestionFilter(SearchAndFilterSet):
         form = QuestionFilterForm
 
 
-class QuestionListView(ListModelView, ListFilterView):
+class QuestionActionChoices(ActionChoices):
+    RESET_VOTE = 'reset_vote'
+    ADD_VOTE = ('add_vote', 'Add One Vote')
+
+
+class QuestionActionHandler(ActionHandler):
+    def reset_vote(self, pk_list):
+        Question.objects.filter(pk__in=pk_list).update(total_vote_count=0)
+
+    def add_vote(self, pk_list):
+        Question.objects.filter(pk__in=pk_list).update(
+            total_vote_count=F('total_vote_count')+1)
+
+
+class QuestionListView(ListActionMixin, ListModelView, ListFilterView):
     list_display = [
         'question_text', 'creator', 'choice_list', 'show_vote',
         'pub_date', 'total_vote_count'
     ]
     filterset_class = QuestionFilter
+    action_choices = QuestionActionChoices
+    action_handler = QuestionActionHandler
 
 
 class QuestionDetailView(DetailModelView):
