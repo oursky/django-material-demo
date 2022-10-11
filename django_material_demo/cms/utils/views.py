@@ -126,8 +126,8 @@ class ListActionMixin(object):
         pk_list = params.getlist("pk[]")
         chosen_action = params["action"]
         if chosen_action in self.action_choices.values:
-            chosen_func = getattr(self.action_handler, chosen_action)
-            chosen_func(self.action_handler, pk_list)
+            chosen_func = getattr(self.action_handler(), chosen_action)
+            chosen_func(pk_list)
 
     def post(self, request, *args, **kwargs):
         submit_type = self.request.POST.get("submit_type", [])
