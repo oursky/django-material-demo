@@ -1,7 +1,8 @@
 from datetime import timedelta
 
 from django import forms
-from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.db.models import Count
 from django.forms import EmailField, IntegerField
@@ -10,17 +11,60 @@ from django.http import HttpResponse
 from django.views import generic
 from django_filters import CharFilter, NumberFilter
 from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
-                                      SuperModelForm)
+                                      ModelFormField, SuperModelForm)
 from material import Layout, Row
-from material.frontend.views import (DetailModelView, ListModelView,
-                                     ModelViewSet, UpdateModelView)
+from material.frontend.views import (CreateModelView, DetailModelView,
+                                     ListModelView, ModelViewSet,
+                                     UpdateModelView)
 from polls.models import QuestionFollower, User, UserFollower
 
 from ...utils import (FormSetForm, ListFilterView, SearchAndFilterSet,
                       get_html_list)
 
 
-class AccountForm(UserChangeForm):
+class AccountCreateForm(UserCreationForm):
+    email = EmailField(required=True)
+
+    layout = Layout(
+        'username',
+        'email',
+        Row('password1', 'password2'),
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'email']
+
+
+class UserCreateForm(SuperModelForm):
+    account = ModelFormField(AccountCreateForm)
+
+    layout = Layout(
+        'account',
+        'group',
+        Row('subs_start', 'subs_expire')
+    )
+
+    class Meta:
+        model = User
+        fields = ['group', 'subs_start', 'subs_expire']
+        widgets = {'group': RadioSelect}
+
+    def save(self, commit=True):
+        if commit:
+            # manually save account form before main form
+            form = self.forms['account']
+            field = self.composite_fields['account']
+            account_instance = field.save(self, 'account', form, commit=commit)
+            if account_instance:
+                self.instance.account = account_instance
+
+            return self.save_form(commit=commit)
+        else:
+            return super().save(commit)
+
+
+class AccountUpdateForm(UserChangeForm):
     email = EmailField(required=True)
 
     layout = Layout(
@@ -69,8 +113,8 @@ class FollowedQuestionsForm(FormSetForm):
         return time
 
 
-class UserForm(SuperModelForm):
-    account = ForeignKeyFormField(AccountForm)
+class UserUpdateForm(SuperModelForm):
+    account = ForeignKeyFormField(AccountUpdateForm)
     subs_day_count = IntegerField(min_value=0, required=False,
                                   label='Subscription duration (in days)')
 
@@ -140,9 +184,14 @@ class UserForm(SuperModelForm):
         return instance
 
 
+class UserCreateView(CreateModelView):
+    def get_form_class(self):
+        return UserCreateForm
+
+
 class UserUpdateView(UpdateModelView):
     def get_form_class(self):
-        return UserForm
+        return UserUpdateForm
 
 
 class UserDetailView(DetailModelView):
@@ -237,6 +286,7 @@ class UserListView(ListModelView, ListFilterView):
 
 class UserViewSet(ModelViewSet):
     model = User
+    create_view_class = UserCreateView
     update_view_class = UserUpdateView
     detail_view_class = UserDetailView
     list_view_class = UserListView
