@@ -2,27 +2,8 @@ from functools import reduce
 from operator import or_
 
 from django.db.models import Q
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
 from django_filters import CharFilter, FilterSet
 from django_filters.views import FilterView
-
-
-def get_html_list(arr):
-    """Generate a HTML unordered list from an iterable
-
-    Return an empty string instead when iterable is empty
-    """
-    if len(arr) == 0:
-        return ''
-
-    #TODO: replace with template
-    value_list = [conditional_escape(x) for x in arr]
-    value_list_html = mark_safe(
-        '<ul>'
-        + ''.join('<li>' + x + '</li>' for x in value_list)
-        + '</ul>')
-    return value_list_html
 
 
 class ListFilterView(FilterView):

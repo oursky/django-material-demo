@@ -7,6 +7,7 @@ from django.db.models import Count
 from django.forms import EmailField, IntegerField
 from django.forms.widgets import RadioSelect
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.views import generic
 from django_filters import CharFilter, NumberFilter
 from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
@@ -16,8 +17,7 @@ from material.frontend.views import (DetailModelView, ListModelView,
                                      ModelViewSet, UpdateModelView)
 from polls.models import QuestionFollower, User, UserFollower
 
-from ...utils import (FormSetForm, ListFilterView, SearchAndFilterSet,
-                      get_html_list)
+from ...utils import FormSetForm, ListFilterView, SearchAndFilterSet
 
 
 class AccountForm(UserChangeForm):
@@ -164,11 +164,13 @@ class UserDetailView(DetailModelView):
                 yield (field.replace('_', ' ').title(), attr)
 
         auth_groups = account.groups.all()
-        html_list = get_html_list(auth_groups)
+        ctx = {'items': auth_groups}
+        html_list = render_to_string('data/ul.html', ctx)
         yield ('Auth Groups', html_list or None)
 
         user_permissions = account.user_permissions.all()
-        html_list = get_html_list(user_permissions)
+        ctx = {'items': user_permissions}
+        html_list = render_to_string('data/ul.html', ctx)
         yield ('User Permissions', html_list or None)
 
         # Polls fields
@@ -187,19 +189,22 @@ class UserDetailView(DetailModelView):
         # M2M field
         followed_users = user.followed_users.order_by('account__username')
         if len(followed_users):
-            html_list = get_html_list(followed_users)
+            ctx = {'items': followed_users}
+            html_list = render_to_string('data/ul.html', ctx)
             yield ('Followed Users', html_list)
 
         # Reverse relation
         followed_question = user.question_follows.order_by('question_text')
-        html_list = get_html_list(followed_question)
+        ctx = {'items': followed_question}
+        html_list = render_to_string('data/ul.html', ctx)
         yield ('Followed Question', html_list or 'None')
 
         # Relational data
         question_rel = user.questionfollower_set
         notify_time = question_rel.filter(notify_time__isnull=False)
         notify_time = notify_time.values_list('notify_time', flat=True)
-        html_list = get_html_list(notify_time)
+        ctx = {'items': notify_time}
+        html_list = render_to_string('data/ul.html', ctx)
         yield ('Question Notify Times', html_list or 'None')
 
 

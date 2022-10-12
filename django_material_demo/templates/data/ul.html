@@ -1,0 +1,13 @@
+{% comment %}
+Accepted context variables:
+    items: list of items to be rendered
+{% endcomment %}
+{% if items %}
+    <ul>
+    {% for item in items %}
+        <li>{{ item }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <span>None</span>
+{% endif %}

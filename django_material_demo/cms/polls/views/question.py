@@ -4,8 +4,8 @@ from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
 from django.forms.widgets import CheckboxInput
+from django.template.loader import render_to_string
 from django.utils import dateparse, timezone
-from django.utils.safestring import mark_safe
 from django_filters import CharFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
@@ -15,8 +15,7 @@ from material.frontend.views import (CreateModelView, DetailModelView,
 from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
 from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
-                      ListFilterView, NestedModelFormField, SearchAndFilterSet,
-                      get_html_list)
+                      ListFilterView, NestedModelFormField, SearchAndFilterSet)
 
 
 class AttachmentsForm(FormSetForm):
@@ -169,16 +168,14 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
     def disable_fields_conditionally(self):
         # Prevent changing question when poll in progress
-        vote_start = dateparse.parse_datetime(
-            str(self.get_field_value('vote_start')))
-        vote_end = dateparse.parse_datetime(
-            str(self.get_field_value('vote_end')))
-        if vote_start and vote_end:
-            vote_start = vote_start.timestamp()
-            vote_end = vote_end.timestamp()
+        try:
+            vote_start = self.get_field_value('vote_start').timestamp()
+            vote_end = self.get_field_value('vote_end').timestamp()
             now = timezone.now().timestamp()
-            if vote_start <= now <= vote_end:
-                self.fields['question_text'].disabled = True
+            self.fields['question_text'].disabled = (
+                vote_start <= now <= vote_end)
+        except AttributeError:
+            pass  # vote_start/vote_end field value is None
 
     # Related field validations
     def check_vote_end(self):
@@ -310,12 +307,13 @@ class QuestionDetailView(DetailModelView):
         thumbnail_name = thumbnail_name.verbose_name.title()
         for item in super().get_object_data():
             if item[0] == thumbnail_name:
-                # Skip if no image
                 if item[1]:
-                    # TODO: replace with template
-                    image_html = mark_safe(
-                        f"<img class='thumbnail' src='{item[1].url}' "
-                        f"alt='{item[1].name}'>")
+                    ctx = {'attrs': {
+                        'class': 'thumbnail',
+                        'src': item[1].url,
+                        'alt': item[1].name
+                    }}
+                    image_html = render_to_string('data/img.html', ctx)
                     yield (item[0], image_html)
                 else:
                     yield (item[0], 'None')
@@ -323,15 +321,19 @@ class QuestionDetailView(DetailModelView):
                 yield item
 
         attachments = question.attachment_set.all()
-        if len(attachments):
-            # TODO: replace with template
-            attachments = [
-                mark_safe(f"<a href='{x.file.url}'>{x.file.name}</a>")
-                for x in attachments]
-            html_list = get_html_list(attachments)
-            yield ('Attachments', html_list)
-        else:
-            yield ('Attachments', 'None')
+        attachment_links = []
+        for attachment in attachments:
+            ctx = {
+                'content': attachment.file.name,
+                'attrs': {
+                    'href': attachment.file.url,
+                    'download': True
+                },
+            }
+            attachment_links.append(render_to_string('data/a.html', ctx))
+        ctx = {'items': attachment_links}
+        html_list = render_to_string('data/ul.html', ctx)
+        yield ('Attachments', html_list)
 
 
 class QuestionViewSet(ModelViewSet):

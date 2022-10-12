@@ -1,7 +1,7 @@
 from .forms import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
                     NestedModelFormField)
 from .modules import ModuleNamespaceMixin
-from .views import ListFilterView, SearchAndFilterSet, get_html_list
+from .views import ListFilterView, SearchAndFilterSet
 
 __all__ = (
     'FieldDataMixin',
@@ -11,5 +11,4 @@ __all__ = (
     'ModuleNamespaceMixin',
     'ListFilterView',
     'SearchAndFilterSet',
-    'get_html_list',
 )
