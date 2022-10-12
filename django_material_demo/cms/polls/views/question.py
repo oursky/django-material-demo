@@ -58,12 +58,12 @@ class QuestionFollowersFormSet(BaseInlineFormSet):
 
 
 class ChoicesForm(FormSetForm):
-    layout = Layout(Row('choice_text', 'vote_count'))
+    layout = Layout(Row('choice_text_en', 'choice_text_zh_hant', 'vote_count'))
     parent_instance_field = 'question'
 
     class Meta:
         model = Choice
-        fields = ['choice_text', 'vote_count']
+        fields = ['choice_text_en', 'choice_text_zh_hant', 'vote_count']
 
 
 class MaxVoteCountForm(ModelForm, FieldDataMixin):
@@ -118,7 +118,8 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
                                  validate_min=True, min_num=2)
 
     layout = Layout(
-        'question_text',
+        'question_text_en',
+        'question_text_zh_hant',
         Row('total_vote_count', 'thumbnail'),
         Row('creator', 'show_creator'),
         'attachments',
@@ -135,7 +136,8 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
     class Meta:
         model = Question
-        fields = ['question_text', 'total_vote_count', 'thumbnail',
+        fields = ['question_text_en', 'question_text_zh_hant',
+                  'total_vote_count', 'thumbnail',
                   'creator', 'show_creator', 'pub_date',
                   'vote_start', 'vote_end', 'show_vote', 'has_max_vote_count',
                   'max_vote_count', 'min_selection', 'max_selection',
@@ -172,8 +174,9 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
             vote_start = self.get_field_value('vote_start').timestamp()
             vote_end = self.get_field_value('vote_end').timestamp()
             now = timezone.now().timestamp()
-            self.fields['question_text'].disabled = (
-                vote_start <= now <= vote_end)
+            if vote_start <= now <= vote_end:
+                self.fields['question_text_en'].disabled = True
+                self.fields['question_text_zh_hant'].disabled = True
         except AttributeError:
             pass  # vote_start/vote_end field value is None
 
