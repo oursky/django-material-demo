@@ -1,13 +1,25 @@
 {% load static i18n %}
 <script src="{% static 'material/js/custom-elements.min.js' %}"></script>
 <script src="{% static 'material/js/materialize.components.js' %}"></script>
+<script src="{% static 'material/js/materialize.formset.js' %}"></script>
+{% comment %}
+Below is a patched version of DataTable provide in `materialize.components.js`
+This patch must be executed after materialize.components.js but before
+`load` event is fired
+{% endcomment %}
+<script src="{% static 'material/js/materialize.dataTable.js' %}" defer></script>
 <script src="{% static 'material/js/turbolinks.js' %}"></script>
 <script src="{% static 'material/js/jquery.js' %}"></script>
 <script src="{% static 'material/js/jquery.dataTables.js' %}"></script>
 <script src="{% static 'material/js/jquery.activeNavigation.js' %}"></script>
 <script src="{% static 'material/js/jquery.datetimepicker.full.js' %}"></script>
 {# <script src="{% static 'material/js/jquery.formset.js' %}"></script> #}
+{% comment %}
+Below is a replacement of Formset library above, patched to support
+multiple formset in a single form
+{% endcomment %}
 <script src="{% static 'js/jquery/material.formset.js' %}"></script>
+<script src="{% static 'material/js/perfect-scrollbar.min.js' %}"></script>
 <script src="{% static 'material/js/dataTables.fixedHeader.js' %}"></script>
 <script src="{% static 'material/js/dataTables.responsive.js' %}"></script>
 <script src="{% static 'material/js/materialize.js' %}"></script>
