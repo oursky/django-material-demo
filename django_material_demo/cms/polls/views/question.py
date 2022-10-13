@@ -147,7 +147,7 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
         super().__init__(*args, **kwargs)
 
         self.set_initial_data()
-        self.disable_fields_conditionally()
+        self.adjust_field_attrs()
 
     def set_initial_data(self):
         self.formsets["attachments"].header = 'Attachments'
@@ -168,17 +168,20 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
             self.initial["choices"] = choices_queryset
             self.formsets["choices"].queryset = choices_queryset
 
-    def disable_fields_conditionally(self):
-        # Prevent changing question when poll in progress
+    def should_disable_question_text(self):
         try:
             vote_start = self.get_field_value('vote_start').timestamp()
             vote_end = self.get_field_value('vote_end').timestamp()
             now = timezone.now().timestamp()
-            if vote_start <= now <= vote_end:
-                self.fields['question_text_en'].disabled = True
-                self.fields['question_text_zh_hant'].disabled = True
+            return vote_start <= now <= vote_end
         except AttributeError:
-            pass  # vote_start/vote_end field value is None
+            return False  # vote_start/vote_end field value is None
+
+    def adjust_field_attrs(self):
+        # Prevent changing question when poll in progress
+        if self.should_disable_question_text():
+            self.fields['question_text_en'].disabled = True
+            self.fields['question_text_zh_hant'].disabled = True
 
     # Related field validations
     def check_vote_end(self):
