@@ -1,7 +1,13 @@
 {% extends "material/frontend/base_lockscreen.html" %}
-{% load i18n material_form %}
+{% load static i18n material_form %}
+
+{% block css %}
+{{ block.super }}
+<link href="{% static 'css/login.css' %}" rel="stylesheet">
+{% endblock css %}
 
 {% block title %}{% trans 'Log in' %} - {{ block.super }}{% endblock %}
+{% block page_title %}Django Material CMS{% endblock %}
 
 {% block content %}
 <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
@@ -30,4 +36,9 @@
 </form>
 {% endblock %}
 
-{% block icon %}account_circle{% endblock %}
+{% block icon_wrapper %}
+    <div class="logo">
+        {% comment %} add/replace custom overlay logo here {% endcomment %}
+        <i class="logo__icon material-icons">inventory</i>
+    </div>
+{% endblock %}

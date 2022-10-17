@@ -1,0 +1,8 @@
+.registration {
+  /* need !important to override inline style in template */
+  background: linear-gradient(
+    to right top,
+    var(--primary-color-dark),
+    var(--secondary-color-light)
+  ) !important;
+}
