@@ -1,29 +1,9 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, widgets
+from django.forms import widgets
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.edit import (ModelFormMixin, ProcessFormView,
                                        UpdateView)
 from django_superform import ModelFormField
-
-
-class FormSetForm(ModelForm):
-    parent_instance_field = ''
-
-    def __init__(self, parent_instance=None,
-                 get_formset=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.parent_instance = parent_instance
-        self.formset = get_formset and get_formset()
-
-    def save(self, commit):
-        setattr(self.instance, self.parent_instance_field, self.parent_instance)
-        return super().save(commit)
-
-    def full_clean(self):
-        super().full_clean()
-        # NOTE: Ignore parent instance foreign key error as we save ourselves
-        if self._errors.get(self.parent_instance_field):
-            self._errors.pop(self.parent_instance_field)
 
 
 class NestedModelFormField(ModelFormField):

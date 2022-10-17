@@ -16,13 +16,13 @@ from material.frontend.views import (CreateModelView, DetailModelView,
 from modeltranslation.utils import get_translation_fields
 from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
-from ...utils.forms import (FieldDataMixin, FormSetForm,
-                            GetParamAsFormDataMixin, NestedModelFormField)
+from ...utils.forms import (FieldDataMixin, GetParamAsFormDataMixin,
+                            NestedModelFormField)
 from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
                             ListFilterView, SearchAndFilterSet)
 
 
-class AttachmentsForm(FormSetForm):
+class AttachmentsForm(ModelForm):
     file = FileField(label="Attachment",
                      max_length=settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
 
@@ -34,7 +34,7 @@ class AttachmentsForm(FormSetForm):
         fields = ['file']
 
 
-class QuestionFollowersForm(FormSetForm):
+class QuestionFollowersForm(ModelForm):
     layout = Layout(Row('follower', 'ordering'))
     parent_instance_field = 'question'
 
@@ -61,7 +61,7 @@ class QuestionFollowersFormSet(BaseInlineFormSet):
             followers.append(follower)
 
 
-class ChoicesForm(FormSetForm):
+class ChoicesForm(ModelForm):
     layout = Layout(Row(*get_translation_fields('choice_text'), 'vote_count'))
     parent_instance_field = 'question'
 

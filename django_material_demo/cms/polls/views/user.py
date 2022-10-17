@@ -19,7 +19,7 @@ from material.frontend.views import (CreateModelView, DetailModelView,
                                      UpdateModelView)
 from polls.models import QuestionFollower, User, UserFollower
 
-from ...utils.forms import FormSetForm, RangeInput
+from ...utils.forms import RangeInput
 from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
                             ListFilterView, SearchAndFilterSet)
 
@@ -82,7 +82,7 @@ class AccountUpdateForm(UserChangeForm):
     )
 
 
-class FollowedUsersForm(FormSetForm):
+class FollowedUsersForm(forms.ModelForm):
     layout = Layout(Row('followed_user', 'ordering'),
                     Row('enable_email_notify', 'notify_time'))
     parent_instance_field = 'follower'
@@ -99,7 +99,7 @@ class FollowedUsersForm(FormSetForm):
         return time
 
 
-class FollowedQuestionsForm(FormSetForm):
+class FollowedQuestionsForm(forms.ModelForm):
     layout = Layout(Row('question', 'ordering'),
                     Row('enable_email_notify', 'notify_time'))
     parent_instance_field = 'follower'
