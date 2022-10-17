@@ -8,7 +8,7 @@ from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django_filters import DateTimeFilter, TypedMultipleChoiceFilter
-from library.django_superform import InlineFormSetField, SuperModelForm
+from django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,

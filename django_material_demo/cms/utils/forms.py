@@ -1,10 +1,9 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm
+from django.forms import ModelForm, widgets
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.edit import (ModelFormMixin, ProcessFormView,
                                        UpdateView)
-from django.forms import widgets
-from library.django_superform import ModelFormField
+from django_superform import ModelFormField
 
 
 class FormSetForm(ModelForm):

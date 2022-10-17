@@ -3,6 +3,7 @@
 FROM python:3-slim
 
 RUN apt update -y && apt install -y build-essential libpq-dev
+RUN apt install -y git
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1

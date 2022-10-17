@@ -11,8 +11,8 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views import generic
 from django_filters import MultipleChoiceFilter, NumberFilter
-from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
-                                      ModelFormField, SuperModelForm)
+from django_superform import (ForeignKeyFormField, InlineFormSetField,
+                              ModelFormField, SuperModelForm)
 from material import Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
