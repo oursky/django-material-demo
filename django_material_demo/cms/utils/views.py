@@ -129,7 +129,7 @@ class ListActionMixin(object):
         chosen_action = params["action"]
         if chosen_action in self.action_choices.values:
             chosen_func = getattr(self.action_handler(), chosen_action)
-            chosen_func(pk_list)
+            chosen_func(self.model, pk_list)
 
     def post(self, request, *args, **kwargs):
         submit_type = self.request.POST.get("submit_type", [])
@@ -139,8 +139,20 @@ class ListActionMixin(object):
         return super().post(request, *args, **kwargs)
 
 
-class DeletedListModelView(ListModelView):
+class DeletedListActionChoices(ActionChoices):
+    RESTORE = 'restore'
+
+
+class DeletedListActionHandler(ActionHandler):
+    def restore(self, model, pk_list):
+        model.deleted_objects.filter(pk__in=pk_list).undelete()
+
+
+class DeletedListModelView(ListActionMixin, ListModelView):
     template_name_suffix = '_deleted_list'
+    action_choices = DeletedListActionChoices
+    action_handler = DeletedListActionHandler
+
 
     def get_queryset(self):
         qs = super().get_queryset()

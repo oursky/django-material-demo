@@ -302,14 +302,14 @@ class UserActionChoices(ActionChoices):
 
 
 class UserActionHandler(ActionHandler):
-    def assign_group(self, pk_list, group):
-        User.objects.filter(pk__in=pk_list).update(group=group)
+    def assign_group(self, model, pk_list, group):
+        model.objects.filter(pk__in=pk_list).update(group=group)
 
-    def assign_default(self, pk_list):
-        return self.assign_group(pk_list, 'DEFAULT')
+    def assign_default(self, model, pk_list):
+        return self.assign_group(model, pk_list, 'DEFAULT')
 
-    def assign_subs(self, pk_list):
-        return self.assign_group(pk_list, 'SUBS')
+    def assign_subs(self, model, pk_list):
+        return self.assign_group(model, pk_list, 'SUBS')
 
 
 class UserListView(ListActionMixin, ListModelView, ListFilterView):

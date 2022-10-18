@@ -323,11 +323,11 @@ class QuestionActionChoices(ActionChoices):
 
 
 class QuestionActionHandler(ActionHandler):
-    def reset_vote(self, pk_list):
-        Question.objects.filter(pk__in=pk_list).update(total_vote_count=0)
+    def reset_vote(self, model, pk_list):
+        model.objects.filter(pk__in=pk_list).update(total_vote_count=0)
 
-    def add_vote(self, pk_list):
-        Question.objects.filter(pk__in=pk_list).update(
+    def add_vote(self, model, pk_list):
+        model.objects.filter(pk__in=pk_list).update(
             total_vote_count=F('total_vote_count')+1)
 
 
