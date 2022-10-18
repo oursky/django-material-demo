@@ -20,8 +20,9 @@ from material.frontend.views import (CreateModelView, DetailModelView,
 from polls.models import QuestionFollower, User, UserFollower
 
 from ...utils.forms import RangeInput
-from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
-                            ListFilterView, SearchAndFilterSet)
+from ...utils.views import (ActionChoices, ActionHandler, DeletedListMixin,
+                            ListActionMixin, ListFilterView,
+                            SearchAndFilterSet)
 
 
 class AccountCreateForm(UserCreationForm):
@@ -312,14 +313,15 @@ class UserActionHandler(ActionHandler):
 
 
 class UserListView(ListActionMixin, ListModelView, ListFilterView):
-    list_display = ['name', 'group', 'followers_list']
     filterset_class = UserFilter
     action_choices = UserActionChoices
     action_handler = UserActionHandler
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(ModelViewSet, DeletedListMixin):
     model = User
+    list_display = ['name', 'group', 'followers_list']
+
     create_view_class = UserCreateView
     update_view_class = UserUpdateView
     detail_view_class = UserDetailView

@@ -18,7 +18,8 @@ from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
 from ...utils.forms import (FieldDataMixin, GetParamAsFormDataMixin,
                             NestedModelFormField)
-from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
+from ...utils.views import (ActionChoices, ActionHandler, DeletedListMixin,
+                            DeletedListModelView, ListActionMixin,
                             ListFilterView, SearchAndFilterSet)
 
 
@@ -340,6 +341,10 @@ class QuestionListView(ListActionMixin, ListModelView, ListFilterView):
     action_handler = QuestionActionHandler
 
 
+class QuestionDeletedListView(DeletedListModelView):
+    list_display = ['question_text', 'creator', 'choice_list']
+
+
 class QuestionDetailView(DetailModelView):
     def get_object_data(self):
         question = super().get_object()
@@ -376,9 +381,10 @@ class QuestionDetailView(DetailModelView):
         yield ('Attachments', html_list)
 
 
-class QuestionViewSet(ModelViewSet):
+class QuestionViewSet(ModelViewSet, DeletedListMixin):
     model = Question
     create_view_class = QuestionCreateView
     update_view_class = QuestionUpdateView
     list_view_class = QuestionListView
+    deleted_list_view_class = QuestionDeletedListView
     detail_view_class = QuestionDetailView

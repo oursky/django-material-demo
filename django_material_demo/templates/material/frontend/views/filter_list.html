@@ -34,5 +34,13 @@
         </form>
         </div>
     {% endif %}
+    {% url view.model|frontend_urlname:'deleted_list' as deleted_list_url %}
+    {% if deleted_list_url %}
+    <div class="card">
+        <div class="card-action center-align">
+            <a class="btn" href="{{ deleted_list_url }}">Show Deleted</a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock right-panel %}

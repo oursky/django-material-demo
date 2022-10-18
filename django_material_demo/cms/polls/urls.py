@@ -1,7 +1,7 @@
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
-from .views import deleted_objects, question, user, vote
+from .views import question, user, vote
 
 urlpatterns = [
     path('', RedirectView.as_view(url='user/', permanent=True), name='index'),
@@ -15,7 +15,4 @@ urlpatterns = [
 
     path('question/', include(question.QuestionViewSet().urls)),
     path('vote/', include(vote.VoteViewSet().urls)),
-    path('deleted_objects/',
-         deleted_objects.DeletedObjectListView.as_view(),
-         name='deleted_objects')
 ]
