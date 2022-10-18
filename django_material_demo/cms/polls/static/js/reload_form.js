@@ -15,8 +15,15 @@
     );
   }
 
-  $(document).ready(function () {
+  function init() {
     // allow only one execution since handler is reattached on each form reload
     $(document).one("change", "input[data-reload-form]", reloadForm);
-  });
+  }
+
+  if (document.readyState === "complete") {
+    init();
+  } else {
+    document.addEventListener("turbolinks:load", init, { once: true });
+  }
+  document.addEventListener("turbolinks:render", init);
 }

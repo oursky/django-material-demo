@@ -78,7 +78,6 @@ class MaxVoteCountForm(ModelForm, FieldDataMixin):
     #     widget=CheckboxInput(attrs={'data-reload-form': True}))
 
     layout = Layout(Row('has_max_vote_count', 'max_vote_count'))
-    template_name = 'cms_polls/forms/max_vote_count_form.html'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -269,6 +268,8 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
 
 class QuestionCreateView(CreateModelView, GetParamAsFormDataMixin):
+    template_name = 'material/frontend/views/media_form.html'
+
     def get_initial(self):
         initial = super().get_initial()
         # Set initial creator to current user
@@ -282,6 +283,8 @@ class QuestionCreateView(CreateModelView, GetParamAsFormDataMixin):
 
 
 class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
+    template_name = 'material/frontend/views/media_form.html'
+
     def get_form_class(self):
         return QuestionForm
 

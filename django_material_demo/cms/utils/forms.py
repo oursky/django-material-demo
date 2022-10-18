@@ -43,7 +43,7 @@ class FieldDataMixin(object):
     def get_field_value(self, field_name):
         if self.is_bound:
             # get value from boundfield
-            val = self[field_name].value()
+            val = self[field_name].data
             try:
                 # format value by form field
                 return self[field_name].field.to_python(val)
