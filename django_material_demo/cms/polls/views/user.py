@@ -9,7 +9,7 @@ from django.forms.widgets import RadioSelect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views import generic
-from django_filters import CharFilter, NumberFilter
+from django_filters import CharFilter, MultipleChoiceFilter, NumberFilter
 from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                       SuperModelForm)
 from material import Layout, Row
@@ -17,7 +17,8 @@ from material.frontend.views import (DetailModelView, ListModelView,
                                      ModelViewSet, UpdateModelView)
 from polls.models import QuestionFollower, User, UserFollower
 
-from ...utils import FormSetForm, ListFilterView, SearchAndFilterSet
+from ...utils import (FormSetForm, ListFilterView, RangeInput,
+                      SearchAndFilterSet)
 
 
 class AccountForm(UserChangeForm):
@@ -211,19 +212,28 @@ class UserDetailView(DetailModelView):
 class UserFilterForm(forms.Form):
     layout = Layout('search',
                     'group',
-                    'account__username',
                     'min_follower_count')
 
 
 class UserFilter(SearchAndFilterSet):
     search_fields = ['account__username', 'group']
 
-    account__username = CharFilter(lookup_expr='icontains',
-                                   label='Name contains')
+    group_choices = User._meta.get_field('group').get_choices(False)
+    group = MultipleChoiceFilter(choices=group_choices)
 
-    min_follower_count = NumberFilter(field_name='user_followed',
-                                      method='filter_count_gte',
-                                      label='Minimum follower count')
+    highest_follower_count = max(
+        User.objects.annotate(count=Count('user_followed'))
+                    .values_list('count', flat=True))
+    min_follower_count_widget_attrs = {
+        'type': 'range',
+        'min': 0,
+        'max': highest_follower_count
+    }
+    min_follower_count = NumberFilter(
+        field_name='user_followed',
+        widget=RangeInput(attrs=min_follower_count_widget_attrs),
+        method='filter_count_gte',
+        label='Minimum follower count')
 
     def filter_count_gte(self, queryset, name, value):
         qs = queryset.annotate(name_count=Count(name))

@@ -3,10 +3,10 @@ from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms import (BaseInlineFormSet, BooleanField, FileField,
                           ImageField, ModelForm)
-from django.forms.widgets import CheckboxInput
+from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple
 from django.template.loader import render_to_string
-from django.utils import dateparse, timezone
-from django_filters import CharFilter
+from django.utils import timezone
+from django_filters import DateTimeFilter, TypedMultipleChoiceFilter
 from library.django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
@@ -278,25 +278,40 @@ class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
 
 class QuestionFilterForm(forms.Form):
     layout = Layout('search',
-                    'question_text',
-                    'show_vote')
+                    'show_vote',
+                    'creator__isnull',
+                    'pub_date__gt', 'pub_date__lt')
+
+
+def str_to_bool(s):
+    return str(s).lower() in ['true', 'yes', '1']
 
 
 class QuestionFilter(SearchAndFilterSet):
     search_fields = ['question_text', 'creator__account__username',
                      'choice__choice_text']
 
-    question_text = CharFilter(lookup_expr='icontains')
+    pub_date__gt = DateTimeFilter(field_name='pub_date', lookup_expr='gt',
+                                  label='Published after')
+    pub_date__lt = DateTimeFilter(field_name='pub_date', lookup_expr='lt',
+                                  label='Published before')
+
+    NEGATED_BOOLEAN_CHOICES = ((False, 'Yes'), (True, 'No'))
+    creator__isnull = TypedMultipleChoiceFilter(
+        choices=NEGATED_BOOLEAN_CHOICES, label='Has creator',
+        coerce=str_to_bool, widget=CheckboxSelectMultiple)
 
     class Meta:
         model = Question
-        fields = {'show_vote': ['exact']}
+        fields = {'show_vote': ['exact'], 'creator': ['isnull']}
         form = QuestionFilterForm
 
 
 class QuestionListView(ListModelView, ListFilterView):
-    list_display = ['question_text', 'creator', 'choice_list',
-                    'vote_start', 'vote_end', 'selection_bounds']
+    list_display = [
+        'question_text', 'creator', 'choice_list', 'show_vote',
+        'pub_date', 'total_vote_count'
+    ]
     filterset_class = QuestionFilter
 
 

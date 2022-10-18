@@ -1,5 +1,5 @@
 from .forms import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
-                    NestedModelFormField)
+                    NestedModelFormField, RangeInput)
 from .modules import ModuleNamespaceMixin
 from .views import ListFilterView, SearchAndFilterSet
 
@@ -8,6 +8,7 @@ __all__ = (
     'FormSetForm',
     'GetParamAsFormDataMixin',
     'NestedModelFormField',
+    'RangeInput',
     'ModuleNamespaceMixin',
     'ListFilterView',
     'SearchAndFilterSet',
