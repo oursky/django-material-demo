@@ -1,18 +1,16 @@
-{% extends 'material/frontend/views/list.html' %}
+{% extends 'material/frontend/views/filter_list.html' %}
 {% load i18n material_form material_frontend %}
 
 {% block breadcrumbs_items %}
 <a class="active" href="{% url view.model|frontend_urlname:'deleted_list' %}">Deleted {{ view.model|verbose_name_plural|title }}</a>
 {% endblock %}
 
-{% block right-panel %}
-<div class="right-panel">
+{% block navlinks %}
     <div class="card">
         <div class="card-action center-align">
             <a class="btn" href="{% url view.model|frontend_urlname:'list' %}">Show Existing</a>
         </div>
     </div>
-</div>
-{% endblock right-panel %}
+{% endblock navlinks %}
 
 {% block action_btn %}{% endblock %}

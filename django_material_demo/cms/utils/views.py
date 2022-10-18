@@ -149,20 +149,14 @@ class DeletedListActionHandler(ActionHandler):
 
 
 class DeletedListModelView(ListActionMixin, ListModelView):
+    template_name = 'material/frontend/views/deleted_list.html'
     template_name_suffix = '_deleted_list'
     action_choices = DeletedListActionChoices
     action_handler = DeletedListActionHandler
 
-
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.all(force_visibility=DELETED_ONLY_VISIBLE)
-
-    def get_template_names(self):
-        template_list = super().get_template_names()
-        if template_list[-1] == 'material/frontend/views/list.html':
-            template_list[-1] = 'material/frontend/views/deleted_list.html'
-        return template_list
 
     def get_list_display_links(self, list_display):
         return []

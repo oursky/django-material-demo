@@ -3,7 +3,8 @@
 
 {% block right-panel %}
 <div class="right-panel">
-    {% if filter %}
+    {% block filters %}
+        {% if filter %}
         <div class="card">
         <dmc-form>
         <form method="GET" action="./">
@@ -17,8 +18,10 @@
         </form>
         </dmc-form>
         </div>
-    {% endif %}
-    {% if action_form %}
+        {% endif %}
+    {% endblock filters %}
+    {% block actions %}
+        {% if action_form %}
         <div class="card">
         <form id="action-form" method="POST" action="./">
             {% csrf_token %}
@@ -33,14 +36,17 @@
             </div>
         </form>
         </div>
-    {% endif %}
-    {% url view.model|frontend_urlname:'deleted_list' as deleted_list_url %}
-    {% if deleted_list_url %}
-    <div class="card">
-        <div class="card-action center-align">
-            <a class="btn" href="{{ deleted_list_url }}">Show Deleted</a>
+        {% endif %}
+    {% endblock actions %}
+    {% block navlinks %}
+        {% url view.model|frontend_urlname:'deleted_list' as deleted_list_url %}
+        {% if deleted_list_url %}
+        <div class="card">
+            <div class="card-action center-align">
+                <a class="btn" href="{{ deleted_list_url }}">Show Deleted</a>
+            </div>
         </div>
-    </div>
-    {% endif %}
+        {% endif %}
+    {% endblock navlinks %}
 </div>
 {% endblock right-panel %}
