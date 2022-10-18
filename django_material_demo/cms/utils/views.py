@@ -78,9 +78,9 @@ class ListActionMixin(object):
     action_handler = ActionHandler
 
     def __init__(self, *args, **kwargs):
-        if self.list_display and self.list_display[0] != 'pk':
-            self.list_display.insert(0, 'pk')
         super().__init__(*args, **kwargs)
+        if self.list_display and self.list_display[0] != 'pk':
+            self.list_display = ['pk', *self.list_display]
 
     def get_datatable_config(self):
         config = {
