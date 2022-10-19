@@ -12,6 +12,7 @@ from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
                                      UpdateModelView)
+from modeltranslation.utils import get_translation_fields
 from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
 from ...utils import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
@@ -58,12 +59,12 @@ class QuestionFollowersFormSet(BaseInlineFormSet):
 
 
 class ChoicesForm(FormSetForm):
-    layout = Layout(Row('choice_text_en', 'choice_text_zh_hant', 'vote_count'))
+    layout = Layout(Row(*get_translation_fields('choice_text'), 'vote_count'))
     parent_instance_field = 'question'
 
     class Meta:
         model = Choice
-        fields = ['choice_text_en', 'choice_text_zh_hant', 'vote_count']
+        fields = [*get_translation_fields('choice_text'), 'vote_count']
 
 
 class MaxVoteCountForm(ModelForm, FieldDataMixin):
@@ -118,8 +119,7 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
                                  validate_min=True, min_num=2)
 
     layout = Layout(
-        'question_text_en',
-        'question_text_zh_hant',
+        *get_translation_fields('question_text'),
         Row('total_vote_count', 'thumbnail'),
         Row('creator', 'show_creator'),
         'attachments',
@@ -136,7 +136,7 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
     class Meta:
         model = Question
-        fields = ['question_text_en', 'question_text_zh_hant',
+        fields = [*get_translation_fields('question_text'),
                   'total_vote_count', 'thumbnail',
                   'creator', 'show_creator', 'pub_date',
                   'vote_start', 'vote_end', 'show_vote', 'has_max_vote_count',
@@ -180,8 +180,8 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
     def adjust_field_attrs(self):
         # Prevent changing question when poll in progress
         if self.should_disable_question_text():
-            self.fields['question_text_en'].disabled = True
-            self.fields['question_text_zh_hant'].disabled = True
+            for field_name in get_translation_fields('question_text'):
+                self.fields[field_name].disabled = True
 
     # Related field validations
     def check_vote_end(self):
