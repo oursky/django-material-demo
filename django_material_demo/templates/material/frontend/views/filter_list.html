@@ -3,17 +3,36 @@
 
 {% block right-panel %}
 <div class="right-panel">
-    <div class="card">
-    <dmc-form>
-    <form method="GET" action="./">
-        <div class="card-content">
-            {% form form=filter.form %}{% endform %}
+    {% if filter %}
+        <div class="card">
+        <dmc-form>
+        <form method="GET" action="./">
+            <div class="card-content">
+                <div class="card-title">Filters</div>
+                {% form form=filter.form %}{% endform %}
+            </div>
+            <div class="card-action">
+                <button type="submit" class="waves-effect waves-light btn white-text">Apply</button>
+            </div>
+        </form>
+        </dmc-form>
         </div>
-        <div class="card-action">
-            <button type="submit" class="waves-effect waves-light btn white-text">Apply</button>
+    {% endif %}
+    {% if action_form %}
+        <div class="card">
+        <form id="action-form" method="POST" action="./">
+            {% csrf_token %}
+            {{ action_form.media }}
+            <div class="card-content">
+                <div class="card-title">Actions</div>
+                {% form form=action_form %}{% endform %}
+            </div>
+            <div class="card-action">
+                <button type="submit" name="submit_type" value="action"
+                class="waves-effect waves-light btn white-text">Apply</button>
+            </div>
+        </form>
         </div>
-    </form>
-    </dmc-form>
-    </div>
+    {% endif %}
 </div>
 {% endblock right-panel %}

@@ -10,7 +10,7 @@ from django.forms.widgets import RadioSelect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views import generic
-from django_filters import CharFilter, MultipleChoiceFilter, NumberFilter
+from django_filters import MultipleChoiceFilter, NumberFilter
 from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
                                       ModelFormField, SuperModelForm)
 from material import Layout, Row
@@ -19,8 +19,9 @@ from material.frontend.views import (CreateModelView, DetailModelView,
                                      UpdateModelView)
 from polls.models import QuestionFollower, User, UserFollower
 
-from ...utils import (FormSetForm, ListFilterView, RangeInput,
-                      SearchAndFilterSet)
+from ...utils.forms import FormSetForm, RangeInput
+from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
+                            ListFilterView, SearchAndFilterSet)
 
 
 class AccountCreateForm(UserCreationForm):
@@ -294,9 +295,27 @@ class UserFilter(SearchAndFilterSet):
         form = UserFilterForm
 
 
-class UserListView(ListModelView, ListFilterView):
+class UserActionChoices(ActionChoices):
+    ASSIGN_TO_DEFAULT_GROUP = 'assign_default'
+    ASSIGN_TO_SUBS_GROUP = ('assign_subs', 'Assign As Subscriber')
+
+
+class UserActionHandler(ActionHandler):
+    def assign_group(self, pk_list, group):
+        User.objects.filter(pk__in=pk_list).update(group=group)
+
+    def assign_default(self, pk_list):
+        return self.assign_group(pk_list, 'DEFAULT')
+
+    def assign_subs(self, pk_list):
+        return self.assign_group(pk_list, 'SUBS')
+
+
+class UserListView(ListActionMixin, ListModelView, ListFilterView):
     list_display = ['name', 'group', 'followers_list']
     filterset_class = UserFilter
+    action_choices = UserActionChoices
+    action_handler = UserActionHandler
 
 
 class UserViewSet(ModelViewSet):
