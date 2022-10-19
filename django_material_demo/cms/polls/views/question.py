@@ -13,6 +13,7 @@ from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
                                      UpdateModelView)
+from modeltranslation.utils import get_translation_fields
 from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
 from ...utils.forms import (FieldDataMixin, FormSetForm,
@@ -61,12 +62,12 @@ class QuestionFollowersFormSet(BaseInlineFormSet):
 
 
 class ChoicesForm(FormSetForm):
-    layout = Layout(Row('choice_text', 'vote_count'))
+    layout = Layout(Row(*get_translation_fields('choice_text'), 'vote_count'))
     parent_instance_field = 'question'
 
     class Meta:
         model = Choice
-        fields = ['choice_text', 'vote_count']
+        fields = [*get_translation_fields('choice_text'), 'vote_count']
 
 
 class MaxVoteCountForm(ModelForm, FieldDataMixin):
@@ -121,7 +122,7 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
                                  validate_min=True, min_num=2)
 
     layout = Layout(
-        'question_text',
+        *get_translation_fields('question_text'),
         Row('total_vote_count', 'thumbnail'),
         Row('creator', 'show_creator'),
         'attachments',
@@ -138,7 +139,8 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
     class Meta:
         model = Question
-        fields = ['question_text', 'total_vote_count', 'thumbnail',
+        fields = [*get_translation_fields('question_text'),
+                  'total_vote_count', 'thumbnail',
                   'creator', 'show_creator', 'pub_date',
                   'vote_start', 'vote_end', 'show_vote', 'has_max_vote_count',
                   'max_vote_count', 'min_selection', 'max_selection',
@@ -148,7 +150,7 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
         super().__init__(*args, **kwargs)
 
         self.set_initial_data()
-        self.disable_fields_conditionally()
+        self.adjust_field_attrs()
 
     def set_initial_data(self):
         self.formsets["attachments"].header = 'Attachments'
@@ -169,16 +171,20 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
             self.initial["choices"] = choices_queryset
             self.formsets["choices"].queryset = choices_queryset
 
-    def disable_fields_conditionally(self):
-        # Prevent changing question when poll in progress
+    def should_disable_question_text(self):
         try:
             vote_start = self.get_field_value('vote_start').timestamp()
             vote_end = self.get_field_value('vote_end').timestamp()
             now = timezone.now().timestamp()
-            self.fields['question_text'].disabled = (
-                vote_start <= now <= vote_end)
+            return vote_start <= now <= vote_end
         except AttributeError:
-            pass  # vote_start/vote_end field value is None
+            return False  # vote_start/vote_end field value is None
+
+    def adjust_field_attrs(self):
+        # Prevent changing question when poll in progress
+        if self.should_disable_question_text():
+            for field_name in get_translation_fields('question_text'):
+                self.fields[field_name].disabled = True
 
     # Related field validations
     def check_vote_end(self):

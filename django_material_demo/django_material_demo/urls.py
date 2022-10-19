@@ -18,10 +18,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.urls import include, path
+from django.views.generic.base import RedirectView
 from material.frontend import urls as frontend_urls
 from polls.forms import EmailLoginForm
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='polls/', permanent=True), name='index'),
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
     # Override login page from Frontend
     path('cms/accounts/login/', LoginView.as_view(

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.edit import (ModelFormMixin, ProcessFormView,
@@ -63,7 +64,12 @@ class FieldDataMixin(object):
     def get_field_value(self, field_name):
         if self.is_bound:
             # get value from boundfield
-            return self[field_name].value()
+            val = self[field_name].value()
+            try:
+                # format value by form field
+                return self[field_name].field.to_python(val)
+            except ValidationError:
+                return val
         else:
             # use initial value
             return self.initial.get(field_name)
