@@ -1,6 +1,9 @@
 {% extends 'material/frontend/base.html' %}
 {% load i18n static settings %}
 
+{% block title %}{% trans "Django Material CMS" %}{% endblock %}
+{% block page_title %}{% trans "Django Material CMS" %}{% endblock %}
+
 {% block css %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/colour-override.css' %}" />

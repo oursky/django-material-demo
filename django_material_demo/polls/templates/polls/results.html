@@ -1,20 +1,43 @@
-{% include './includes/change_lang_form.html' %}
-{% include './includes/top_nav.html' %}
+{% extends 'polls/base_site.html' %}
 
-<p>
-    <a href={% url 'app_polls:home' %}>Home</a> >
-    <a href={% url 'app_polls:question' question.id %}>{{ question.question_text }}</a> >
+{% block breadcrumbs_items %}
+    <a href="{% url 'app_polls:home' %}">Home</a>
+    <a href="{% url 'app_polls:question' question.id %}">{{ question.question_text }}</a>
     <a class="active">Results</a>
-</p>
+{% endblock %}
 
-<fieldset>
-    <legend><h1>{{ question.question_text }}</h1></legend>
-    <h2>Results</h2>
-    <ul>
-        {% for choice in question.choice_set.all %}
-            <li>{{ choice.choice_text }} -- {{ choice.vote_count }} vote{{ choice.vote_count|pluralize }}</li>
-        {% endfor %}
-    </ul>
-</fieldset>
-
-<a href="{% url 'app_polls:question' question.id %}">Vote again?</a>
+{% block content %}
+<div class="card">
+    <div class="card-content">
+        <span class="card-title">
+        <div class="valign-wrapper">
+            Results - {{ question.question_text }}
+            {% if question.thumbnail %}
+                {% with img=question.thumbnail %}
+                <img class='thumbnail' src='{{img.url}}' alt='{{img.name}}'>
+                {% endwith %}
+            {% endif %}
+        </div>
+        </span>
+        <table class="highlight">
+            <thead>
+                <tr>
+                    <th>Choice</th>
+                    <th>Vote Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for choice in question.choice_set.all %}
+                <tr>
+                    <td>{{ choice.choice_text }}</td>
+                    <td>{{ choice.vote_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-action">
+        <a href="{% url 'app_polls:question' question.id %}">Vote again?</a>
+    </div>
+</div>
+{% endblock %}
