@@ -11,17 +11,18 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views import generic
 from django_filters import MultipleChoiceFilter, NumberFilter
-from library.django_superform import (ForeignKeyFormField, InlineFormSetField,
-                                      ModelFormField, SuperModelForm)
+from django_superform import (ForeignKeyFormField, InlineFormSetField,
+                              ModelFormField, SuperModelForm)
 from material import Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
                                      UpdateModelView)
 from polls.models import QuestionFollower, User, UserFollower
 
-from ...utils.forms import FormSetForm, RangeInput
-from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
-                            ListFilterView, SearchAndFilterSet)
+from ...utils.forms import RangeInput
+from ...utils.views import (ActionChoices, ActionHandler, DeletedListMixin,
+                            ListActionMixin, ListFilterView,
+                            SearchAndFilterSet)
 
 
 class AccountCreateForm(UserCreationForm):
@@ -82,7 +83,7 @@ class AccountUpdateForm(UserChangeForm):
     )
 
 
-class FollowedUsersForm(FormSetForm):
+class FollowedUsersForm(forms.ModelForm):
     layout = Layout(Row('followed_user', 'ordering'),
                     Row('enable_email_notify', 'notify_time'))
     parent_instance_field = 'follower'
@@ -99,7 +100,7 @@ class FollowedUsersForm(FormSetForm):
         return time
 
 
-class FollowedQuestionsForm(FormSetForm):
+class FollowedQuestionsForm(forms.ModelForm):
     layout = Layout(Row('question', 'ordering'),
                     Row('enable_email_notify', 'notify_time'))
     parent_instance_field = 'follower'
@@ -301,25 +302,26 @@ class UserActionChoices(ActionChoices):
 
 
 class UserActionHandler(ActionHandler):
-    def assign_group(self, pk_list, group):
-        User.objects.filter(pk__in=pk_list).update(group=group)
+    def assign_group(self, model, pk_list, group):
+        model.objects.filter(pk__in=pk_list).update(group=group)
 
-    def assign_default(self, pk_list):
-        return self.assign_group(pk_list, 'DEFAULT')
+    def assign_default(self, model, pk_list):
+        return self.assign_group(model, pk_list, 'DEFAULT')
 
-    def assign_subs(self, pk_list):
-        return self.assign_group(pk_list, 'SUBS')
+    def assign_subs(self, model, pk_list):
+        return self.assign_group(model, pk_list, 'SUBS')
 
 
 class UserListView(ListActionMixin, ListModelView, ListFilterView):
-    list_display = ['name', 'group', 'followers_list']
     filterset_class = UserFilter
     action_choices = UserActionChoices
     action_handler = UserActionHandler
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(ModelViewSet, DeletedListMixin):
     model = User
+    list_display = ['name', 'group', 'followers_list']
+
     create_view_class = UserCreateView
     update_view_class = UserUpdateView
     detail_view_class = UserDetailView

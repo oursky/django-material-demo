@@ -1,11 +1,10 @@
-from .forms import (FieldDataMixin, FormSetForm, GetParamAsFormDataMixin,
+from .forms import (FieldDataMixin, GetParamAsFormDataMixin,
                     NestedModelFormField, RangeInput)
 from .modules import ModuleNamespaceMixin
 from .views import ListFilterView, SearchAndFilterSet
 
 __all__ = (
     'FieldDataMixin',
-    'FormSetForm',
     'GetParamAsFormDataMixin',
     'NestedModelFormField',
     'RangeInput',

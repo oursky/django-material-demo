@@ -1,9 +1,0 @@
-{% load i18n material_form material_form_internal %}
-
-{% with bound_field.value as form %}
-    {% if form.template_name == "django/forms/default.html" %}
-        {% form form=form %}{% endform %}
-    {% else %}
-        {% form form=form template=form.template_name %}{% endform %}
-    {% endif %}
-{% endwith %}

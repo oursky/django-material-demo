@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 from django_filters import CharFilter, FilterSet
 from django_filters.views import FilterView
+from material.frontend.views import ListModelView
+from safedelete.config import DELETED_ONLY_VISIBLE
 
 
 class ListFilterView(FilterView):
@@ -127,7 +129,7 @@ class ListActionMixin(object):
         chosen_action = params["action"]
         if chosen_action in self.action_choices.values:
             chosen_func = getattr(self.action_handler(), chosen_action)
-            chosen_func(pk_list)
+            chosen_func(self.model, pk_list)
 
     def post(self, request, *args, **kwargs):
         submit_type = self.request.POST.get("submit_type", [])
@@ -135,3 +137,58 @@ class ListActionMixin(object):
             self.handle_action(self.request.POST)
             return HttpResponseRedirect("./")
         return super().post(request, *args, **kwargs)
+
+
+class DeletedListActionChoices(ActionChoices):
+    RESTORE = 'restore'
+
+
+class DeletedListActionHandler(ActionHandler):
+    def restore(self, model, pk_list):
+        model.deleted_objects.filter(pk__in=pk_list).undelete()
+
+
+class DeletedListModelView(ListActionMixin, ListModelView):
+    template_name = 'material/frontend/views/deleted_list.html'
+    template_name_suffix = '_deleted_list'
+    action_choices = DeletedListActionChoices
+    action_handler = DeletedListActionHandler
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.all(force_visibility=DELETED_ONLY_VISIBLE)
+
+    def get_list_display_links(self, list_display):
+        return []
+
+
+class DeletedListMixin(object):
+    # mixin to be used with ModelViewSet
+    deleted_list_view_class = DeletedListModelView
+
+    def get_deleted_list_view(self):
+        """Function view for objects deleted_list."""
+        return self.deleted_list_view_class.as_view(
+            **self.get_deleted_list_view_kwargs())
+
+    def get_deleted_list_view_kwargs(self, **kwargs):
+        """Configuration arguments for deleted_list view.
+
+        May not be called if `get_deleted_list_view` is overridden.
+        """
+        result = {
+            'list_display': self.list_display,
+            'list_display_links': self.list_display_links,
+            'ordering': self.ordering
+        }
+        result.update(kwargs)
+        return self.filter_kwargs(self.deleted_list_view_class, **result)
+
+    @property
+    def deleted_list_view(self):
+        """Triple (regexp, view, name) for deleted_list view url config."""
+        return [
+            '^deleted/$',
+            self.get_deleted_list_view(),
+            '{model_name}_deleted_list'
+        ]

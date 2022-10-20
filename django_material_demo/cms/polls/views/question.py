@@ -8,7 +8,7 @@ from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django_filters import DateTimeFilter, TypedMultipleChoiceFilter
-from library.django_superform import InlineFormSetField, SuperModelForm
+from django_superform import InlineFormSetField, SuperModelForm
 from material import Fieldset, Layout, Row
 from material.frontend.views import (CreateModelView, DetailModelView,
                                      ListModelView, ModelViewSet,
@@ -16,13 +16,14 @@ from material.frontend.views import (CreateModelView, DetailModelView,
 from modeltranslation.utils import get_translation_fields
 from polls.models import Attachment, Choice, Question, QuestionFollower, User
 
-from ...utils.forms import (FieldDataMixin, FormSetForm,
-                            GetParamAsFormDataMixin, NestedModelFormField)
-from ...utils.views import (ActionChoices, ActionHandler, ListActionMixin,
+from ...utils.forms import (FieldDataMixin, GetParamAsFormDataMixin,
+                            NestedModelFormField)
+from ...utils.views import (ActionChoices, ActionHandler, DeletedListMixin,
+                            DeletedListModelView, ListActionMixin,
                             ListFilterView, SearchAndFilterSet)
 
 
-class AttachmentsForm(FormSetForm):
+class AttachmentsForm(ModelForm):
     file = FileField(label="Attachment",
                      max_length=settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
 
@@ -34,7 +35,7 @@ class AttachmentsForm(FormSetForm):
         fields = ['file']
 
 
-class QuestionFollowersForm(FormSetForm):
+class QuestionFollowersForm(ModelForm):
     layout = Layout(Row('follower', 'ordering'))
     parent_instance_field = 'question'
 
@@ -61,7 +62,7 @@ class QuestionFollowersFormSet(BaseInlineFormSet):
             followers.append(follower)
 
 
-class ChoicesForm(FormSetForm):
+class ChoicesForm(ModelForm):
     layout = Layout(Row(*get_translation_fields('choice_text'), 'vote_count'))
     parent_instance_field = 'question'
 
@@ -77,7 +78,6 @@ class MaxVoteCountForm(ModelForm, FieldDataMixin):
     #     widget=CheckboxInput(attrs={'data-reload-form': True}))
 
     layout = Layout(Row('has_max_vote_count', 'max_vote_count'))
-    template_name = 'cms_polls/forms/max_vote_count_form.html'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -268,6 +268,8 @@ class QuestionForm(SuperModelForm, FieldDataMixin):
 
 
 class QuestionCreateView(CreateModelView, GetParamAsFormDataMixin):
+    template_name = 'material/frontend/views/media_form.html'
+
     def get_initial(self):
         initial = super().get_initial()
         # Set initial creator to current user
@@ -281,6 +283,8 @@ class QuestionCreateView(CreateModelView, GetParamAsFormDataMixin):
 
 
 class QuestionUpdateView(UpdateModelView, GetParamAsFormDataMixin):
+    template_name = 'material/frontend/views/media_form.html'
+
     def get_form_class(self):
         return QuestionForm
 
@@ -322,11 +326,11 @@ class QuestionActionChoices(ActionChoices):
 
 
 class QuestionActionHandler(ActionHandler):
-    def reset_vote(self, pk_list):
-        Question.objects.filter(pk__in=pk_list).update(total_vote_count=0)
+    def reset_vote(self, model, pk_list):
+        model.objects.filter(pk__in=pk_list).update(total_vote_count=0)
 
-    def add_vote(self, pk_list):
-        Question.objects.filter(pk__in=pk_list).update(
+    def add_vote(self, model, pk_list):
+        model.objects.filter(pk__in=pk_list).update(
             total_vote_count=F('total_vote_count')+1)
 
 
@@ -338,6 +342,10 @@ class QuestionListView(ListActionMixin, ListModelView, ListFilterView):
     filterset_class = QuestionFilter
     action_choices = QuestionActionChoices
     action_handler = QuestionActionHandler
+
+
+class QuestionDeletedListView(DeletedListModelView):
+    list_display = ['question_text', 'creator', 'choice_list']
 
 
 class QuestionDetailView(DetailModelView):
@@ -376,9 +384,10 @@ class QuestionDetailView(DetailModelView):
         yield ('Attachments', html_list)
 
 
-class QuestionViewSet(ModelViewSet):
+class QuestionViewSet(ModelViewSet, DeletedListMixin):
     model = Question
     create_view_class = QuestionCreateView
     update_view_class = QuestionUpdateView
     list_view_class = QuestionListView
+    deleted_list_view_class = QuestionDeletedListView
     detail_view_class = QuestionDetailView

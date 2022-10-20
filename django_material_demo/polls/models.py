@@ -2,9 +2,10 @@ from django.conf import settings
 from django.contrib import admin
 from django.db import models
 from django.utils import timezone
+from safedelete.models import SafeDeleteModel
 
 
-class User(models.Model):
+class User(SafeDeleteModel):
     account = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -62,7 +63,7 @@ class UserFollower(models.Model):
         return str(self.follower) + ' → ' + str(self.followed_user)
 
 
-class Question(models.Model):
+class Question(SafeDeleteModel):
     question_text = models.CharField(max_length=200)
     total_vote_count = models.IntegerField(default=0)
 
@@ -132,7 +133,7 @@ class Choice(models.Model):
         return self.choice_text
 
 
-class Vote(models.Model):
+class Vote(SafeDeleteModel):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
     is_custom = models.BooleanField(default=False)
