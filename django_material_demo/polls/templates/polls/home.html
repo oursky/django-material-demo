@@ -1,29 +1,32 @@
-{% load static %}
+{% extends 'polls/base_site.html' %}
 
-{% include './includes/change_lang_form.html' %}
-{% include './includes/top_nav.html' %}
-<link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-<p>
+{% block breadcrumbs_items %}
     <a class="active">Home</a>
-</p>
+{% endblock %}
 
-<fieldset>
-    <legend><h1>Polls</h1></legend>
+{% block content %}
+<div class="card">
+<div class="card-content">
+    <span class="card-title">Polls</span>
     {% if latest_question_list %}
-        <ul>
+        <div class="collection">
             {% for question in latest_question_list %}
-            <li><a href="{% url 'app_polls:question' question.id %}">
+            <a class="collection-item"
+            href="{% url 'app_polls:question' question.id %}">
+            <div class="valign-wrapper">
                 {{ question.question_text }}
                 {% if question.thumbnail %}
                     {% with img=question.thumbnail %}
                     <img class='thumbnail' src='{{img.url}}' alt='{{img.name}}'>
                     {% endwith %}
                 {% endif %}
-            </a></li>
+            </div>
+            </a>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
         <p>No polls are available.</p>
     {% endif %}
-</fieldset>
+</div>
+</div>
+{% endblock %}

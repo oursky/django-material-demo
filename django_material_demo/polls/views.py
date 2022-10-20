@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 
-from .models import Choice, Question
+from .models import Choice, Question, Vote
 
 
 class HomeView(generic.ListView):
@@ -44,7 +44,10 @@ def vote(request, question_id):
         })
     else:
         selected_choice.vote_count += 1
+        question.total_vote_count += 1
         selected_choice.save()
+        question.save()
+        Vote.objects.create(question=question, choice=selected_choice)
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.

@@ -1,24 +1,25 @@
-{% load static %}
+{% extends 'polls/base_site.html' %}
 
-{% include './includes/change_lang_form.html' %}
-{% include './includes/top_nav.html' %}
-<link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-<p>
-    <a href={% url 'app_polls:home' %}>Home</a> >
+{% block breadcrumbs_items %}
+    <a href="{% url 'app_polls:home' %}">Home</a>
     <a class="active">{{ question.question_text }}</a>
-</p>
+{% endblock %}
 
+{% block content %}
+<div class="card">
 <form action="{% url 'app_polls:vote' question.id %}" method="post">
     {% csrf_token %}
-    <fieldset>
-        <legend><h1>{{ question.question_text }}
-        {% if question.thumbnail %}
-            {% with img=question.thumbnail %}
-            <img class='thumbnail' src='{{img.url}}' alt='{{img.name}}'>
-            {% endwith %}
-        {% endif %}
-        </h1></legend>
+    <div class="card-content">
+        <span class="card-title">
+        <div class="valign-wrapper">
+            {{ question.question_text }}
+            {% if question.thumbnail %}
+                {% with img=question.thumbnail %}
+                <img class='thumbnail' src='{{img.url}}' alt='{{img.name}}'>
+                {% endwith %}
+            {% endif %}
+        </div>
+        </span>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
         {% for choice in question.choice_set.all %}
             <label for="choice{{ forloop.counter }}">
@@ -27,7 +28,7 @@
             </label><br>
         {% endfor %}
         {% if question.attachment_set.count %}
-            <h2>Attachments</h2>
+            <span class="card-title">Attachments</span>
             <ul>
             {% for attachment in question.attachment_set.all %}
                 <li><a href='{{attachment.file.url}}'>
@@ -36,6 +37,10 @@
             {% endfor %}
             </ul>
         {% endif %}
-    </fieldset>
-    <input type="submit" value="Vote">
+    </div>
+    <div class="card-action">
+        <button class="btn waves-effect waves-light" type="submit" name="action">Vote</button>
+    </div>
 </form>
+</div>
+{% endblock %}
