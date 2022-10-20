@@ -1,76 +1,84 @@
-- model: polls.file
+- model: polls.user
   pk: 1
   fields:
-    file_id: 13506345-1758-2436-17324824
-    storage_loc: local_storage
-    file_name: IMG_0001.png
-    file_type: image/png
-    file_size: 103853
-- model: polls.file
+    account: 1
+    group: SUBS
+    subs_start: null
+    subs_expire: null
+- model: polls.user
   pk: 2
   fields:
-    file_id: 12345678-4567-2378-19472675
-    storage_loc: gcs
-    file_name: IMG_0002.png
-    file_type: image/png
-    file_size: 148743
+    account: 2
+    group: SUBS
+    subs_start: null
+    subs_expire: null
 - model: polls.user
   pk: 3
   fields:
+    account: 3
     group: SA
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 4
   fields:
+    account: 4
     group: SA
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 5
   fields:
-    group: DEFAULT
+    account: 5
+    group: SUBS
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 6
   fields:
-    group: DEFAULT
+    account: 6
+    group: SUBS
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 7
   fields:
-    group: DEFAULT
+    account: 7
+    group: SUBS
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 8
   fields:
-    group: SUBS
+    account: 8
+    group: SA
     subs_start: 2022-08-16
-    subs_expire: 2022-10-19
+    subs_expire: 2022-10-15
 - model: polls.user
   pk: 9
   fields:
-    group: DEFAULT
+    account: 9
+    group: SUBS
     subs_start: null
     subs_expire: null
 - model: polls.user
   pk: 10
   fields:
+    account: 10
     group: SUBS
     subs_start: 2022-07-13
     subs_expire: 2022-11-29
 - model: polls.user
   pk: 11
   fields:
-    group: SUBS
+    account: 11
+    group: DEFAULT
     subs_start: 2022-05-10
     subs_expire: 2022-09-19
 - model: polls.user
   pk: 12
   fields:
+    account: 12
     group: DEFAULT
     subs_start: null
     subs_expire: null
@@ -78,10 +86,10 @@
   pk: 1
   fields:
     follower: 8
-    followed_user: 2
+    followed_user: 9
     ordering: 0.0
     enable_email_notify: false
-    notify_time: null
+    notify_time: '18:00:00'
 - model: polls.userfollower
   pk: 2
   fields:
@@ -169,7 +177,7 @@
     followed_user: 5
     ordering: 0.0
     enable_email_notify: false
-    notify_time: null
+    notify_time: '20:00:00'
 - model: polls.userfollower
   pk: 14
   fields:
@@ -193,7 +201,7 @@
     followed_user: 6
     ordering: 0.0
     enable_email_notify: false
-    notify_time: null
+    notify_time: '20:00:00'
 - model: polls.userfollower
   pk: 17
   fields:
@@ -259,14 +267,6 @@
     enable_email_notify: false
     notify_time: null
 - model: polls.userfollower
-  pk: 26
-  fields:
-    follower: 8
-    followed_user: 9
-    ordering: 0.0
-    enable_email_notify: false
-    notify_time: null
-- model: polls.userfollower
   pk: 27
   fields:
     follower: 1
@@ -318,42 +318,42 @@
   pk: 1
   fields:
     question_text: What's up?
-    total_vote_count: 6
-    thumbnail: null
-    creator: 3
-    show_creator: false
+    total_vote_count: 66
+    thumbnail: ''
+    creator: null
+    show_creator: true
     pub_date: 2022-08-12 03:35:51+00:00
     vote_start: 2022-08-18 11:20:20+00:00
     vote_end: null
-    show_vote: END
+    show_vote: VOTE
     min_selection: 1
     max_selection: null
-    has_max_vote_count: false
-    max_vote_count: null
-    allow_custom: true
+    has_max_vote_count: true
+    max_vote_count: 123
+    allow_custom: false
 - model: polls.question
   pk: 2
   fields:
     question_text: What is your favourite colour?
     total_vote_count: 0
-    thumbnail: null
-    creator: null
+    thumbnail: ''
+    creator: 6
     show_creator: false
-    pub_date: 2022-08-19 04:29:47+00:00
-    vote_start: 2022-08-19 04:29:47+00:00
-    vote_end: 2022-08-31 12:00:00+00:00
+    pub_date: 2022-09-15 20:00:40+00:00
+    vote_start: 2022-09-18 12:00:00+00:00
+    vote_end: 2022-10-12 14:00:00+00:00
     show_vote: END
     min_selection: 1
     max_selection: null
     has_max_vote_count: true
-    max_vote_count: 100
+    max_vote_count: 123
     allow_custom: true
 - model: polls.choice
   pk: 1
   fields:
     question: 1
     choice_text: Not much
-    vote_count: 3
+    vote_count: 23
 - model: polls.choice
   pk: 3
   fields:
@@ -371,13 +371,13 @@
   fields:
     question: 2
     choice_text: Green
-    vote_count: 2
+    vote_count: 3
 - model: polls.choice
   pk: 6
   fields:
     question: 2
     choice_text: Blue
-    vote_count: 1
+    vote_count: 2
 - model: polls.choice
   pk: 7
   fields:
@@ -389,13 +389,13 @@
   fields:
     question: 2
     choice_text: White
-    vote_count: 0
+    vote_count: 1
 - model: polls.choice
   pk: 13
   fields:
     question: 1
     choice_text: The sky
-    vote_count: 3
+    vote_count: 42
 - model: polls.vote
   pk: 1
   fields:
@@ -436,13 +436,8 @@
     is_custom: true
     choice: null
     custom_choice_text: Violet
-- model: polls.attachment
-  pk: 2
-  fields:
-    question: 2
-    file: 2
 - model: polls.questionfollower
-  pk: 4
+  pk: 1
   fields:
     question: 1
     follower: 6
@@ -450,7 +445,7 @@
     enable_email_notify: false
     notify_time: null
 - model: polls.questionfollower
-  pk: 14
+  pk: 2
   fields:
     question: 2
     follower: 9
@@ -458,7 +453,7 @@
     enable_email_notify: false
     notify_time: null
 - model: polls.questionfollower
-  pk: 15
+  pk: 3
   fields:
     question: 2
     follower: 4
@@ -466,7 +461,7 @@
     enable_email_notify: false
     notify_time: '12:10:00'
 - model: polls.questionfollower
-  pk: 16
+  pk: 4
   fields:
     question: 2
     follower: 7
@@ -474,15 +469,15 @@
     enable_email_notify: false
     notify_time: null
 - model: polls.questionfollower
-  pk: 17
+  pk: 5
   fields:
     question: 2
     follower: 8
     ordering: 0.0
     enable_email_notify: false
-    notify_time: 04:55:17
+    notify_time: 04:55:00
 - model: polls.questionfollower
-  pk: 18
+  pk: 6
   fields:
     question: 2
     follower: 5
@@ -490,15 +485,7 @@
     enable_email_notify: false
     notify_time: null
 - model: polls.questionfollower
-  pk: 30
-  fields:
-    question: 1
-    follower: 6
-    ordering: 2.0
-    enable_email_notify: false
-    notify_time: null
-- model: polls.questionfollower
-  pk: 31
+  pk: 7
   fields:
     question: 1
     follower: 1
