@@ -266,25 +266,32 @@ class UserFilterForm(forms.Form):
                     'min_follower_count')
 
 
+def get_highest_follower_count():
+    qs = User.objects.annotate(count=Count('user_followed'))
+    return max(qs.values_list('count', flat=True))
+
+
 class UserFilter(SearchAndFilterSet):
     search_fields = ['account__username', 'group']
 
     group_choices = User._meta.get_field('group').get_choices(False)
     group = MultipleChoiceFilter(choices=group_choices)
 
-    highest_follower_count = max(
-        User.objects.annotate(count=Count('user_followed'))
-                    .values_list('count', flat=True))
-    min_follower_count_widget_attrs = {
-        'type': 'range',
-        'min': 0,
-        'max': highest_follower_count
-    }
+    # Must not use SafeDeleteQueryset when creating class attribute
+    # or migration will not work
     min_follower_count = NumberFilter(
         field_name='user_followed',
-        widget=RangeInput(attrs=min_follower_count_widget_attrs),
+        widget=RangeInput(),
         method='filter_count_gte',
         label='Minimum follower count')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.min_follower_count.widget.attrs.update({
+            'type': 'range',
+            'min': 0,
+            'max': get_highest_follower_count(),
+        })
 
     def filter_count_gte(self, queryset, name, value):
         qs = queryset.annotate(name_count=Count(name))
