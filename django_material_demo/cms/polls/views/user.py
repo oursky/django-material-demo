@@ -287,7 +287,7 @@ class UserFilter(SearchAndFilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.min_follower_count.widget.attrs.update({
+        self.filters['min_follower_count'].extra['widget'].attrs.update({
             'type': 'range',
             'min': 0,
             'max': get_highest_follower_count(),
