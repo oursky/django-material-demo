@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('polls', '0014_remove_file_model_and_more'),
+        ('polls', '0015_choice_choice_text_en_choice_choice_text_zh_hant_and_more'),
     ]
 
     operations = [
