@@ -1,3 +1,5 @@
+DEPRECATED: Up stream deprecated as of Feb 2024: https://github.com/viewflow/django-material
+
 # django-material-demo
 
 ## Goal
